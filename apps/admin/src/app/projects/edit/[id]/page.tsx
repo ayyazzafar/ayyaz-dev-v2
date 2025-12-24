@@ -3,7 +3,7 @@
 import { useOne, useUpdate, useGo } from "@refinedev/core";
 import { useForm } from "react-hook-form";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,26 +19,26 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
+import { MultiImageUpload, ProjectImage } from "@/components/multi-image-upload";
 
 interface ProjectForm {
   title: string;
   slug: string;
   description: string;
-  content: string;
-  image: string;
-  demoUrl: string;
-  repoUrl: string;
+  longDescription: string;
+  url: string;
+  github: string;
   status: string;
   type: string;
   featured: boolean;
   order: number;
-  technologyIds: string[];
 }
 
 export default function ProjectEditPage() {
   const params = useParams();
   const id = params.id as string;
   const go = useGo();
+  const [images, setImages] = useState<ProjectImage[]>([]);
 
   const { data, isLoading } = useOne({
     resource: "projects",
@@ -63,30 +63,74 @@ export default function ProjectEditPage() {
   // Load data into form when fetched
   useEffect(() => {
     if (data?.data) {
-      const project = data.data as ProjectForm;
+      const project = data.data as any;
       reset({
         title: project.title,
         slug: project.slug,
         description: project.description || "",
-        content: project.content || "",
-        image: project.image || "",
-        demoUrl: project.demoUrl || "",
-        repoUrl: project.repoUrl || "",
+        longDescription: project.longDescription || "",
+        url: project.url || "",
+        github: project.github || "",
         status: project.status,
         type: project.type,
         featured: project.featured,
         order: project.order,
-        technologyIds: project.technologyIds || [],
       });
+      // Set images array
+      if (project.images && project.images.length > 0) {
+        setImages(project.images.map((img: any, index: number) => ({
+          id: img.id,
+          url: img.url,
+          alt: img.alt || null,
+          order: img.order ?? index,
+        })));
+      }
     }
   }, [data, reset]);
 
   const onSubmit = (formData: ProjectForm) => {
+    // Build the update payload - only include fields with valid values
+    const updateData: any = {
+      title: formData.title,
+      slug: formData.slug,
+      description: formData.description || null,
+      longDescription: formData.longDescription || null,
+      status: formData.status || "ACTIVE",
+      type: formData.type || "PRODUCT",
+      featured: formData.featured ?? false,
+      order: formData.order ?? 0,
+    };
+
+    // Only include URLs if they have valid values (not empty strings)
+    if (formData.url && formData.url.trim()) {
+      updateData.url = formData.url;
+    } else {
+      updateData.url = null;
+    }
+
+    if (formData.github && formData.github.trim()) {
+      updateData.github = formData.github;
+    } else {
+      updateData.github = null;
+    }
+
+    // Handle images array
+    if (images.length > 0) {
+      updateData.images = images.map((img, index) => ({
+        id: img.id,
+        url: img.url,
+        alt: img.alt || null,
+        order: index,
+      }));
+    } else {
+      updateData.images = [];
+    }
+
     update(
       {
         resource: "projects",
         id,
-        values: formData,
+        values: updateData,
       },
       {
         onSuccess: () => {
@@ -151,7 +195,7 @@ export default function ProjectEditPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Short Description</Label>
               <Textarea
                 id="description"
                 {...register("description")}
@@ -161,10 +205,10 @@ export default function ProjectEditPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="content">Content (Markdown)</Label>
+              <Label htmlFor="longDescription">Long Description (Markdown)</Label>
               <Textarea
-                id="content"
-                {...register("content")}
+                id="longDescription"
+                {...register("longDescription")}
                 placeholder="Full project content in markdown..."
                 rows={6}
               />
@@ -174,39 +218,43 @@ export default function ProjectEditPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Links & Media</CardTitle>
+            <CardTitle>Project Images</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MultiImageUpload
+              value={images}
+              onChange={setImages}
+              label="Project Images (first image is cover)"
+              maxImages={10}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Links</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="demoUrl">Demo URL</Label>
+                <Label htmlFor="url">Demo URL</Label>
                 <Input
-                  id="demoUrl"
+                  id="url"
                   type="url"
-                  {...register("demoUrl")}
+                  {...register("url")}
                   placeholder="https://demo.example.com"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="repoUrl">Repository URL</Label>
+                <Label htmlFor="github">GitHub URL</Label>
                 <Input
-                  id="repoUrl"
+                  id="github"
                   type="url"
-                  {...register("repoUrl")}
+                  {...register("github")}
                   placeholder="https://github.com/user/repo"
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
-              <Input
-                id="image"
-                type="url"
-                {...register("image")}
-                placeholder="https://example.com/image.jpg"
-              />
             </div>
           </CardContent>
         </Card>
@@ -219,9 +267,9 @@ export default function ProjectEditPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label>Status</Label>
-                <Select value={status} onValueChange={(v) => setValue("status", v)}>
+                <Select value={status || ""} onValueChange={(v) => setValue("status", v)}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ACTIVE">Active</SelectItem>
@@ -234,9 +282,9 @@ export default function ProjectEditPage() {
 
               <div className="space-y-2">
                 <Label>Type</Label>
-                <Select value={type} onValueChange={(v) => setValue("type", v)}>
+                <Select value={type || ""} onValueChange={(v) => setValue("type", v)}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="PRODUCT">Product</SelectItem>

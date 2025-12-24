@@ -78,14 +78,35 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </div>
         </div>
 
-        {/* Project Image */}
+        {/* Project Images Gallery */}
         {project.images && project.images.length > 0 && (
-          <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-            <img
-              src={project.images[0].url}
-              alt={project.title}
-              className="w-full h-full object-cover"
-            />
+          <div className="space-y-4">
+            {/* Main/Cover Image */}
+            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+              <img
+                src={project.images[0].url}
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Additional Images Grid */}
+            {project.images.length > 1 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {project.images.slice(1).map((image, index) => (
+                  <div
+                    key={image.id || index}
+                    className="aspect-video bg-muted rounded-lg overflow-hidden"
+                  >
+                    <img
+                      src={image.url}
+                      alt={`${project.title} - Image ${index + 2}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

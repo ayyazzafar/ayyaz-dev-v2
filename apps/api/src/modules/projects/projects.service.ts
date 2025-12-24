@@ -206,12 +206,15 @@ export class ProjectsService {
    * - Deletes all existing connections
    * - Creates new connections based on provided IDs
    * This is simpler than diffing and more predictable
+   *
+   * For images:
+   * - If imageUrl is provided, replaces all existing images
    */
   async update(id: string, updateProjectDto: UpdateProjectDto) {
     // Check if project exists
     await this.findOne(id);
 
-    const { technologyIds, ...projectData } = updateProjectDto;
+    const { technologyIds, imageUrl, images, ...projectData } = updateProjectDto;
 
     // If slug is being changed, check for conflicts
     if (projectData.slug) {
@@ -256,6 +259,44 @@ export class ProjectsService {
             projectId: id,
             technologyId: techId,
           })),
+        });
+      }
+    }
+
+    // If images array is provided, replace all existing images
+    if (images !== undefined) {
+      // Delete existing images
+      await this.prisma.projectImage.deleteMany({
+        where: { projectId: id },
+      });
+
+      // Create new images if array has items
+      if (images.length > 0) {
+        await this.prisma.projectImage.createMany({
+          data: images.map((img, index) => ({
+            url: img.url,
+            alt: img.alt || null,
+            order: img.order ?? index,
+            projectId: id,
+          })),
+        });
+      }
+    }
+    // Legacy: If only imageUrl is provided (for backward compatibility)
+    else if (imageUrl !== undefined) {
+      // Delete existing images
+      await this.prisma.projectImage.deleteMany({
+        where: { projectId: id },
+      });
+
+      // Create new image if URL is provided
+      if (imageUrl) {
+        await this.prisma.projectImage.create({
+          data: {
+            url: imageUrl,
+            projectId: id,
+            order: 0,
+          },
         });
       }
     }

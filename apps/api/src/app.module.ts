@@ -9,6 +9,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
 import { TechnologiesModule } from './modules/technologies/technologies.module';
 import { SkillsModule } from './modules/skills/skills.module';
 import { ExperienceModule } from './modules/experience/experience.module';
+import { MediaModule } from './modules/media/media.module';
 
 /**
  * AppModule - The root module of the application
@@ -39,6 +40,7 @@ import { ExperienceModule } from './modules/experience/experience.module';
     TechnologiesModule,
     SkillsModule,
     ExperienceModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

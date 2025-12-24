@@ -80,7 +80,7 @@ export async function getFeaturedProjects() {
 }
 
 export async function getProjectBySlug(slug: string) {
-  const result = await fetchAPI<Project>(`/projects/slug/${slug}`);
+  const result = await fetchAPI<Project>(`/projects/${slug}`);
   return result;
 }
 

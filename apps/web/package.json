@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@ayyaz-dev/web",
   "version": "0.1.0",
   "type": "module",
   "private": true,
@@ -8,10 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@repo/ui": "*",
+    "@ayyaz-dev/database": "workspace:*",
     "next": "16.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

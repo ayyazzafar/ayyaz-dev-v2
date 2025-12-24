@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useCreate, useList, useGo } from "@refinedev/core";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
@@ -17,15 +18,16 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
+import { MultiImageUpload, ProjectImage } from "@/components/multi-image-upload";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProjectForm {
   title: string;
   slug: string;
   description: string;
-  content: string;
-  image: string;
-  demoUrl: string;
-  repoUrl: string;
+  longDescription: string;
+  url: string;
+  github: string;
   status: string;
   type: string;
   featured: boolean;
@@ -36,7 +38,11 @@ interface ProjectForm {
 export default function ProjectCreatePage() {
   const go = useGo();
   const { mutate: create, isLoading: isCreating } = useCreate();
-  const { data: technologies } = useList({ resource: "technologies" });
+  const { data: technologiesData } = useList({ resource: "technologies", pagination: { pageSize: 100 } });
+  const [images, setImages] = useState<ProjectImage[]>([]);
+  const [selectedTechIds, setSelectedTechIds] = useState<string[]>([]);
+
+  const technologies = (technologiesData as any)?.data || [];
 
   const {
     register,
@@ -58,11 +64,45 @@ export default function ProjectCreatePage() {
   const status = watch("status");
   const type = watch("type");
 
-  const onSubmit = (data: ProjectForm) => {
+  const onSubmit = (formData: ProjectForm) => {
+    // Build the create payload
+    const createData: any = {
+      title: formData.title,
+      slug: formData.slug,
+      description: formData.description || null,
+      longDescription: formData.longDescription || null,
+      status: formData.status || "ACTIVE",
+      type: formData.type || "PRODUCT",
+      featured: formData.featured ?? false,
+      order: formData.order ?? 0,
+    };
+
+    // Only include URLs if they have valid values
+    if (formData.url && formData.url.trim()) {
+      createData.url = formData.url;
+    }
+    if (formData.github && formData.github.trim()) {
+      createData.github = formData.github;
+    }
+
+    // Handle images array
+    if (images.length > 0) {
+      createData.images = images.map((img, index) => ({
+        url: img.url,
+        alt: img.alt || null,
+        order: index,
+      }));
+    }
+
+    // Handle technologies
+    if (selectedTechIds.length > 0) {
+      createData.technologyIds = selectedTechIds;
+    }
+
     create(
       {
         resource: "projects",
-        values: data,
+        values: createData,
       },
       {
         onSuccess: () => {
@@ -133,10 +173,10 @@ export default function ProjectCreatePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="content">Content (Markdown)</Label>
+              <Label htmlFor="longDescription">Long Description (Markdown)</Label>
               <Textarea
-                id="content"
-                {...register("content")}
+                id="longDescription"
+                {...register("longDescription")}
                 placeholder="Full project content in markdown..."
                 rows={6}
               />
@@ -146,39 +186,82 @@ export default function ProjectCreatePage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Links & Media</CardTitle>
+            <CardTitle>Project Images</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MultiImageUpload
+              value={images}
+              onChange={setImages}
+              label="Project Images (first image is cover)"
+              maxImages={10}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Technologies</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label>Select technologies used in this project</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-2">
+                {technologies.map((tech: any) => (
+                  <div key={tech.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`tech-${tech.id}`}
+                      checked={selectedTechIds.includes(tech.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedTechIds([...selectedTechIds, tech.id]);
+                        } else {
+                          setSelectedTechIds(selectedTechIds.filter(id => id !== tech.id));
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`tech-${tech.id}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {tech.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {technologies.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No technologies available. Add some in the Technologies section first.
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Links</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="demoUrl">Demo URL</Label>
+                <Label htmlFor="url">Demo URL</Label>
                 <Input
-                  id="demoUrl"
+                  id="url"
                   type="url"
-                  {...register("demoUrl")}
+                  {...register("url")}
                   placeholder="https://demo.example.com"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="repoUrl">Repository URL</Label>
+                <Label htmlFor="github">GitHub URL</Label>
                 <Input
-                  id="repoUrl"
+                  id="github"
                   type="url"
-                  {...register("repoUrl")}
+                  {...register("github")}
                   placeholder="https://github.com/user/repo"
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
-              <Input
-                id="image"
-                type="url"
-                {...register("image")}
-                placeholder="https://example.com/image.jpg"
-              />
             </div>
           </CardContent>
         </Card>

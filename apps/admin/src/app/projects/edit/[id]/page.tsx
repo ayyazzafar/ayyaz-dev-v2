@@ -1,6 +1,6 @@
 "use client";
 
-import { useOne, useUpdate, useGo } from "@refinedev/core";
+import { useOne, useUpdate, useGo, useList } from "@refinedev/core";
 import { useForm } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,6 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { MultiImageUpload, ProjectImage } from "@/components/multi-image-upload";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProjectForm {
   title: string;
@@ -39,11 +40,19 @@ export default function ProjectEditPage() {
   const id = params.id as string;
   const go = useGo();
   const [images, setImages] = useState<ProjectImage[]>([]);
+  const [selectedTechIds, setSelectedTechIds] = useState<string[]>([]);
 
   const { data, isLoading } = useOne({
     resource: "projects",
     id,
   });
+
+  const { data: technologiesData } = useList({
+    resource: "technologies",
+    pagination: { pageSize: 100 },
+  });
+
+  const technologies = (technologiesData as any)?.data || [];
 
   const { mutate: update, isLoading: isUpdating } = useUpdate();
 
@@ -85,6 +94,10 @@ export default function ProjectEditPage() {
           order: img.order ?? index,
         })));
       }
+      // Set selected technologies
+      if (project.technologies && project.technologies.length > 0) {
+        setSelectedTechIds(project.technologies.map((tech: any) => tech.id));
+      }
     }
   }, [data, reset]);
 
@@ -125,6 +138,9 @@ export default function ProjectEditPage() {
     } else {
       updateData.images = [];
     }
+
+    // Handle technologies
+    updateData.technologyIds = selectedTechIds;
 
     update(
       {
@@ -227,6 +243,45 @@ export default function ProjectEditPage() {
               label="Project Images (first image is cover)"
               maxImages={10}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Technologies</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label>Select technologies used in this project</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-2">
+                {technologies.map((tech: any) => (
+                  <div key={tech.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`tech-${tech.id}`}
+                      checked={selectedTechIds.includes(tech.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedTechIds([...selectedTechIds, tech.id]);
+                        } else {
+                          setSelectedTechIds(selectedTechIds.filter(id => id !== tech.id));
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`tech-${tech.id}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {tech.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {technologies.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No technologies available. Add some in the Technologies section first.
+                </p>
+              )}
+            </div>
           </CardContent>
         </Card>
 

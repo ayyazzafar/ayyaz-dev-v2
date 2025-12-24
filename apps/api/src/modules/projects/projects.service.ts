@@ -77,7 +77,7 @@ export class ProjectsService {
    * 3. Connecting technologies via join table
    */
   async create(createProjectDto: CreateProjectDto) {
-    const { technologyIds, ...projectData } = createProjectDto;
+    const { technologyIds, images, ...projectData } = createProjectDto;
 
     // Check if slug already exists
     const existingProject = await this.prisma.project.findUnique({
@@ -114,6 +114,16 @@ export class ProjectsService {
           ? {
               create: technologyIds.map((techId) => ({
                 technology: { connect: { id: techId } },
+              })),
+            }
+          : undefined,
+        // Create images if provided
+        images: images?.length
+          ? {
+              create: images.map((img, index) => ({
+                url: img.url,
+                alt: img.alt || null,
+                order: img.order ?? index,
               })),
             }
           : undefined,

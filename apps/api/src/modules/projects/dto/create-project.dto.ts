@@ -10,7 +10,10 @@ import {
   MinLength,
   Min,
   Matches,
+  ValidateNested,
+  IsNumber,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 /**
  * Enums matching Prisma schema
@@ -71,9 +74,10 @@ export class CreateProjectDto {
    * Short description (for cards/listings)
    * @example "Personal expense tracking application"
    */
+  @IsOptional()
   @IsString()
-  @MinLength(10)
-  description: string;
+  @MinLength(10, { message: 'Description must be at least 10 characters if provided' })
+  description?: string;
 
   /**
    * Full description with details (optional)
@@ -158,4 +162,28 @@ export class CreateProjectDto {
   @IsArray()
   @IsString({ each: true })
   technologyIds?: string[];
+
+  /**
+   * Array of images for the project
+   */
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateProjectImageDto)
+  images?: CreateProjectImageDto[];
+}
+
+/**
+ * CreateProjectImageDto - Represents an image in the images array
+ */
+export class CreateProjectImageDto {
+  @IsUrl({}, { message: 'Image URL must be a valid URL' })
+  url: string;
+
+  @IsOptional()
+  @IsString()
+  alt?: string;
+
+  @IsNumber()
+  order: number;
 }

@@ -224,7 +224,7 @@ export class ProjectsService {
     // Check if project exists
     await this.findOne(id);
 
-    const { technologyIds, imageUrl, images, ...projectData } = updateProjectDto;
+    const { technologyIds, images, ...projectData } = updateProjectDto;
 
     // If slug is being changed, check for conflicts
     if (projectData.slug) {
@@ -289,24 +289,6 @@ export class ProjectsService {
             order: img.order ?? index,
             projectId: id,
           })),
-        });
-      }
-    }
-    // Legacy: If only imageUrl is provided (for backward compatibility)
-    else if (imageUrl !== undefined) {
-      // Delete existing images
-      await this.prisma.projectImage.deleteMany({
-        where: { projectId: id },
-      });
-
-      // Create new image if URL is provided
-      if (imageUrl) {
-        await this.prisma.projectImage.create({
-          data: {
-            url: imageUrl,
-            projectId: id,
-            order: 0,
-          },
         });
       }
     }

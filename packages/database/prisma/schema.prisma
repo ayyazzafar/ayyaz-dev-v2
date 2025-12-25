@@ -32,7 +32,7 @@ model Project {
   id              String        @id @default(cuid())
   slug            String        @unique
   title           String
-  description     String
+  description     String?
   longDescription String?       @db.Text
   status          ProjectStatus @default(ACTIVE)
   type            ProjectType

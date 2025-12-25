@@ -14,7 +14,7 @@ import { CreateTechnologyDto, UpdateTechnologyDto } from './dto';
  */
 @Injectable()
 export class TechnologiesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
    * Create a new technology
@@ -39,10 +39,26 @@ export class TechnologiesService {
   /**
    * Get all technologies
    */
-  async findAll() {
-    return this.prisma.technology.findMany({
-      orderBy: { name: 'asc' },
-    });
+  async findAll(query: { skip?: number, take?: number } = {}) {
+    const { skip = 0, take = 100 } = query;
+    const [technologies, total] = await Promise.all([
+      this.prisma.technology.findMany({
+        orderBy: { name: 'asc' },
+        skip,
+        take,
+      }),
+      this.prisma.technology.count(),
+    ]);
+
+    return {
+      data: technologies,
+      meta: {
+        total,
+        skip,
+        take,
+        hasMore: total > skip + take,
+      },
+    };
   }
 
   /**

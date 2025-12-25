@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { TechnologiesService } from './technologies.service';
@@ -29,7 +30,7 @@ import { Public } from '../auth/decorators';
 @Controller('technologies')
 @UseGuards(JwtAuthGuard)
 export class TechnologiesController {
-  constructor(private readonly technologiesService: TechnologiesService) {}
+  constructor(private readonly technologiesService: TechnologiesService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -42,8 +43,11 @@ export class TechnologiesController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'List all technologies' })
-  findAll() {
-    return this.technologiesService.findAll();
+  findAll(
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+  ) {
+    return this.technologiesService.findAll({ skip: Number(skip), take: Number(take) });
   }
 
   @Public()

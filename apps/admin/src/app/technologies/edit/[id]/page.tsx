@@ -1,101 +1,92 @@
 "use client";
 
-import { useOne, useUpdate, useGo } from "@refinedev/core";
-import { useForm } from "react-hook-form";
-import { useParams } from "next/navigation";
-import { useEffect } from "react";
-import Link from "next/link";
+import { EditView } from "@/components/refine-ui/views/edit-view";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { useForm } from "@refinedev/react-hook-form";
+import { useRouter } from "next/navigation";
 
-interface TechnologyForm {
-  name: string;
-  icon: string;
-}
-
-export default function TechnologyEditPage() {
-  const params = useParams();
-  const id = params.id as string;
-  const go = useGo();
-
-  const { data, isLoading: isFetching } = useOne({ resource: "technologies", id });
-  const { mutate: update, isLoading: isUpdating } = useUpdate();
+export default function TechnologyEdit() {
+  const router = useRouter();
 
   const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<TechnologyForm>();
+    refineCore: { onFinish },
+    ...form
+  } = useForm({
+    refineCoreProps: {},
+  });
 
-  useEffect(() => {
-    if (data?.data) {
-      const tech = data.data as TechnologyForm;
-      reset({ name: tech.name, icon: tech.icon || "" });
-    }
-  }, [data, reset]);
-
-  const onSubmit = (formData: TechnologyForm) => {
-    update(
-      { resource: "technologies", id, values: formData },
-      { onSuccess: () => go({ to: "/technologies" }) }
-    );
-  };
-
-  if (isFetching) return <div className="text-center py-8">Loading...</div>;
+  function onSubmit(values: Record<string, string>) {
+    onFinish(values);
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/technologies">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold">Edit Technology</h1>
-          <p className="text-muted-foreground">Update technology details</p>
-        </div>
-      </div>
+    <EditView>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="name"
+            rules={{ required: "Name is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="Enter name"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>Technology Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                {...register("name", { required: "Name is required" })}
-              />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
-              )}
-            </div>
+          <FormField
+            control={form.control}
+            name="icon"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Icon</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="Enter icon"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="space-y-2">
-              <Label htmlFor="icon">Icon</Label>
-              <Input id="icon" {...register("icon")} />
-            </div>
-
-            <div className="flex gap-4 pt-4">
-              <Button type="submit" disabled={isUpdating}>
-                {isUpdating ? "Saving..." : "Save Changes"}
-              </Button>
-              <Link href="/technologies">
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
-    </div>
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              {...form.saveButtonProps}
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Updating..." : "Update"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </EditView>
   );
 }

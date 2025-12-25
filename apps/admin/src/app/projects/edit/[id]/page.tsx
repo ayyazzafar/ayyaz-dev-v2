@@ -1,387 +1,258 @@
 "use client";
 
-import { useOne, useUpdate, useGo, useList } from "@refinedev/core";
-import { useForm } from "react-hook-form";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { useForm } from "@refinedev/react-hook-form";
+import { useRouter } from "next/navigation";
+
+import { EditView } from "@/components/refine-ui/views/edit-view";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
-import { MultiImageUpload, ProjectImage } from "@/components/multi-image-upload";
+import { ProjectStatus, ProjectType } from "@ayyaz-dev/database";
 import { Checkbox } from "@/components/ui/checkbox";
-
-interface ProjectForm {
-  title: string;
-  slug: string;
-  description: string;
-  longDescription: string;
-  url: string;
-  github: string;
-  status: string;
-  type: string;
-  featured: boolean;
-  order: number;
-}
-
-export default function ProjectEditPage() {
-  const params = useParams();
-  const id = params.id as string;
-  const go = useGo();
-  const [images, setImages] = useState<ProjectImage[]>([]);
-  const [selectedTechIds, setSelectedTechIds] = useState<string[]>([]);
-
-  const { data, isLoading } = useOne({
-    resource: "projects",
-    id,
-  });
-
-  const { data: technologiesData } = useList({
-    resource: "technologies",
-    pagination: { pageSize: 100 },
-  });
-
-  const technologies = (technologiesData as any)?.data || [];
-
-  const { mutate: update, isLoading: isUpdating } = useUpdate();
+export default function ProjectEdit() {
+  const router = useRouter();
 
   const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<ProjectForm>();
+    refineCore: { onFinish, query, formLoading },
+    ...form
+  } = useForm({
+    refineCoreProps: {},
 
-  const featured = watch("featured");
-  const status = watch("status");
-  const type = watch("type");
+  });
 
-  // Load data into form when fetched
-  useEffect(() => {
-    if (data?.data) {
-      const project = data.data as any;
-      reset({
-        title: project.title,
-        slug: project.slug,
-        description: project.description || "",
-        longDescription: project.longDescription || "",
-        url: project.url || "",
-        github: project.github || "",
-        status: project.status,
-        type: project.type,
-        featured: project.featured,
-        order: project.order,
-      });
-      // Set images array
-      if (project.images && project.images.length > 0) {
-        setImages(project.images.map((img: any, index: number) => ({
-          id: img.id,
-          url: img.url,
-          alt: img.alt || null,
-          order: img.order ?? index,
-        })));
-      }
-      // Set selected technologies
-      if (project.technologies && project.technologies.length > 0) {
-        setSelectedTechIds(project.technologies.map((tech: any) => tech.id));
-      }
-    }
-  }, [data, reset]);
+  const projectData = query?.data?.data;
 
-  const onSubmit = (formData: ProjectForm) => {
-    // Build the update payload - only include fields with valid values
-    const updateData: any = {
-      title: formData.title,
-      slug: formData.slug,
-      description: formData.description || null,
-      longDescription: formData.longDescription || null,
-      status: formData.status || "ACTIVE",
-      type: formData.type || "PRODUCT",
-      featured: formData.featured ?? false,
-      order: formData.order ?? 0,
-    };
+  const { onClick: _ignoreClick, ...saveButtonPropsRest } = form.saveButtonProps;
 
-    // Only include URLs if they have valid values (not empty strings)
-    if (formData.url && formData.url.trim()) {
-      updateData.url = formData.url;
-    } else {
-      updateData.url = null;
-    }
-
-    if (formData.github && formData.github.trim()) {
-      updateData.github = formData.github;
-    } else {
-      updateData.github = null;
-    }
-
-    // Handle images array
-    if (images.length > 0) {
-      updateData.images = images.map((img, index) => ({
-        id: img.id,
-        url: img.url,
-        alt: img.alt || null,
-        order: index,
-      }));
-    } else {
-      updateData.images = [];
-    }
-
-    // Handle technologies
-    updateData.technologyIds = selectedTechIds;
-
-    update(
-      {
-        resource: "projects",
-        id,
-        values: updateData,
-      },
-      {
-        onSuccess: () => {
-          go({ to: "/projects" });
-        },
-      }
+  function onSubmit(values: Record<string, string>) {
+    console.log("Raw form values:", values);  // Add this to debug\
+    const cleanedValues = Object.fromEntries(
+      Object.entries(values).filter(([key, v]) => {
+        // Always include boolean fields (like featured)
+        if (typeof v === 'boolean') return true;
+        // Remove empty strings and undefined/null
+        return v !== "" && v !== undefined && v !== null;
+      })
     );
-  };
-
-  if (isLoading) {
-    return <div className="text-center py-8">Loading...</div>;
+    onFinish(cleanedValues);
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/projects">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold">Edit Project</h1>
-          <p className="text-muted-foreground">Update project details</p>
-        </div>
-      </div>
+    <EditView>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="title"
+            rules={{ required: "Title is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="Enter title"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  {...register("title", { required: "Title is required" })}
-                  placeholder="My Awesome Project"
-                />
-                {errors.title && (
-                  <p className="text-sm text-destructive">
-                    {errors.title.message}
-                  </p>
-                )}
-              </div>
+          <FormField
+            control={form.control}
+            name="slug"
+            rules={{ required: "Slug is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="Enter slug"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <div className="space-y-2">
-                <Label htmlFor="slug">Slug *</Label>
-                <Input
-                  id="slug"
-                  {...register("slug", { required: "Slug is required" })}
-                  placeholder="my-awesome-project"
-                />
-                {errors.slug && (
-                  <p className="text-sm text-destructive">
-                    {errors.slug.message}
-                  </p>
-                )}
-              </div>
-            </div>
+          <FormField
+            control={form.control}
+            name="description"
+            rules={{ required: "Description is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="Enter description"
+                    rows={10}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Short Description</Label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                placeholder="A brief description of your project..."
-                rows={3}
-              />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="longDescription">Long Description (Markdown)</Label>
-              <Textarea
-                id="longDescription"
-                {...register("longDescription")}
-                placeholder="Full project content in markdown..."
-                rows={6}
-              />
-            </div>
-          </CardContent>
-        </Card>
+          <FormField
+            control={form.control}
+            name="longDescription"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Long Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="Enter long description"
+                    rows={10}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Project Images</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MultiImageUpload
-              value={images}
-              onChange={setImages}
-              label="Project Images (first image is cover)"
-              maxImages={10}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Technologies</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Label>Select technologies used in this project</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-2">
-                {technologies.map((tech: any) => (
-                  <div key={tech.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`tech-${tech.id}`}
-                      checked={selectedTechIds.includes(tech.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedTechIds([...selectedTechIds, tech.id]);
-                        } else {
-                          setSelectedTechIds(selectedTechIds.filter(id => id !== tech.id));
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor={`tech-${tech.id}`}
-                      className="text-sm cursor-pointer"
-                    >
-                      {tech.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-              {technologies.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No technologies available. Add some in the Technologies section first.
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Links</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="url">Demo URL</Label>
-                <Input
-                  id="url"
-                  type="url"
-                  {...register("url")}
-                  placeholder="https://demo.example.com"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="github">GitHub URL</Label>
-                <Input
-                  id="github"
-                  type="url"
-                  {...register("github")}
-                  placeholder="https://github.com/user/repo"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <Select value={status || ""} onValueChange={(v) => setValue("status", v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
+          <FormField
+            control={form.control}
+            name="type"
+            rules={{ required: "Type is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select project type" />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
-                    <SelectItem value="ACTIVE">Active</SelectItem>
-                    <SelectItem value="COMPLETED">Completed</SelectItem>
-                    <SelectItem value="PAUSED">Paused</SelectItem>
-                    <SelectItem value="ARCHIVED">Archived</SelectItem>
+                    {Object.values(ProjectType).map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.charAt(0) + type.slice(1).toLowerCase()}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-              </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <div className="space-y-2">
-                <Label>Type</Label>
-                <Select value={type || ""} onValueChange={(v) => setValue("type", v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
+          <FormField
+            control={form.control}
+            name="status"
+            rules={{ required: "Status is required" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
-                    <SelectItem value="PRODUCT">Product</SelectItem>
-                    <SelectItem value="CLIENT">Client</SelectItem>
-                    <SelectItem value="EXPERIMENT">Experiment</SelectItem>
-                    <SelectItem value="LEARNING">Learning</SelectItem>
+                    {Object.values(ProjectStatus).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status.charAt(0) + status.slice(1).toLowerCase()}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-              </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <div className="space-y-2">
-                <Label htmlFor="order">Order</Label>
-                <Input
-                  id="order"
-                  type="number"
-                  {...register("order", { valueAsNumber: true })}
-                />
-              </div>
-            </div>
+          <FormField
+            control={form.control}
+            name="featured"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel> Featured</FormLabel>
+                <Checkbox {...field} checked={field.value ?? false} onCheckedChange={field.onChange} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="featured"
-                checked={featured}
-                onCheckedChange={(v) => setValue("featured", v)}
-              />
-              <Label htmlFor="featured">Featured Project</Label>
-            </div>
-          </CardContent>
-        </Card>
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Live URL (optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="https://example.com"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="flex gap-4">
-          <Button type="submit" disabled={isUpdating}>
-            {isUpdating ? "Saving..." : "Save Changes"}
-          </Button>
-          <Link href="/projects">
-            <Button type="button" variant="outline">
+          <FormField
+            control={form.control}
+            name="github"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>GitHub URL (optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value || ""}
+                    placeholder="https://github.com/username/repo"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              {...saveButtonPropsRest}
+              disabled={formLoading}
+            >
+              {formLoading ? "Updating..." : "Update"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+            >
               Cancel
             </Button>
-          </Link>
-        </div>
-      </form>
-    </div>
+          </div>
+        </form>
+      </Form>
+    </EditView>
   );
 }

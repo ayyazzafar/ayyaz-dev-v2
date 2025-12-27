@@ -1,16 +1,7 @@
-"use client";
-
-import { Suspense } from "react";
-
-import { Authenticated } from "@refinedev/core";
-import { NavigateToResource } from "@refinedev/nextjs-router";
-
-export default function IndexPage() {
+export default function Home() {
   return (
-    <Suspense>
-      <Authenticated key="home-page">
-        <NavigateToResource />
-      </Authenticated>
-    </Suspense>
+    <main className="flex min-h-screen items-center justify-center">
+      <h1 className="text-4xl font-bold">Hello World</h1>
+    </main>
   );
 }

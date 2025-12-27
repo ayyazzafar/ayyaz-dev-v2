@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Button } from "@ayyaz-dev/ui/components/button";
-import { Badge } from "@ayyaz-dev/ui/components/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@ayyaz-dev/ui/components/card";
-import { Separator } from "@ayyaz-dev/ui/components/separator";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { getProjectBySlug } from "@/lib/api";
 
 interface ProjectPageProps {

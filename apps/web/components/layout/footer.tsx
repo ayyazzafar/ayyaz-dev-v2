@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Separator } from "@ayyaz-dev/ui/components/separator";
+import { Separator } from "@/components/ui/separator";
 
 export function Footer() {
   return (

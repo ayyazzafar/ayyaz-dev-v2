@@ -1,5 +1,0 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-/* Shared theme variables from UI package */
-@import "@ayyaz-dev/ui/styles/theme.css";

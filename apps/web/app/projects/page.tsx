@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ayyaz-dev/ui/components/card";
-import { Badge } from "@ayyaz-dev/ui/components/badge";
-import { Button } from "@ayyaz-dev/ui/components/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getProjects } from "@/lib/api";
 
 export const metadata = {

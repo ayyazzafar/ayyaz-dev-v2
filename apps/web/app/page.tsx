@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Button } from "@ayyaz-dev/ui/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@ayyaz-dev/ui/components/card";
-import { Badge } from "@ayyaz-dev/ui/components/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { getFeaturedProjects } from "@/lib/api";
 
 export default async function HomePage() {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@ayyaz-dev/ui/lib/utils";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Home" },

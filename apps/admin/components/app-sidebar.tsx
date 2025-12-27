@@ -25,14 +25,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { useGetMe, useLogout } from "@/hooks/use-auth"
+import { useEffect } from "react"
 
-// This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: "Acme Inc",
@@ -157,6 +153,25 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const getMeMutation = useGetMe()
+  const logout = useLogout()
+
+  useEffect(() => {
+    getMeMutation.mutate()
+  }, [])
+
+  const user = getMeMutation.data
+    ? {
+        name: getMeMutation.data.name || getMeMutation.data.email,
+        email: getMeMutation.data.email,
+        avatar: "",
+      }
+    : {
+        name: "Loading...",
+        email: "",
+        avatar: "",
+      }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -167,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} onLogout={logout} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

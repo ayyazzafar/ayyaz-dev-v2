@@ -89,9 +89,9 @@ export function LoginForm({
           </form>
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop"
+              alt="Abstract gradient background"
+              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.7]"
             />
           </div>
         </CardContent>

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +23,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 import {
   useTechnologiesControllerFindAll,
@@ -31,25 +40,35 @@ import {
   useTechnologiesControllerRemove,
   getTechnologiesControllerFindAllQueryKey,
 } from "@/lib/api/generated/technologies/technologies";
-import type {
-  CreateTechnologyDto,
-  UpdateTechnologyDto,
-  TechnologyDto,
-  TechnologyListResponseDto,
-} from "@/lib/api/schemas";
+import type { TechnologyDto } from "@/lib/api/schemas";
+import { technologiesControllerCreateBody } from "@/lib/api/generated/zod";
+import { z } from "zod";
+
+// Form values type inferred from Orval-generated Zod schema
+type TechnologyFormValues = z.infer<typeof technologiesControllerCreateBody>;
 
 export default function TechnologiesPage() {
   const queryClient = useQueryClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [editingTechnology, setEditingTechnology] = useState<TechnologyDto | null>(null);
-  const [deletingTechnology, setDeletingTechnology] = useState<TechnologyDto | null>(null);
-  const [formData, setFormData] = useState({ name: "", icon: "" });
+  const [editingTechnology, setEditingTechnology] =
+    useState<TechnologyDto | null>(null);
+  const [deletingTechnology, setDeletingTechnology] =
+    useState<TechnologyDto | null>(null);
 
-  const { data: response, isLoading } = useTechnologiesControllerFindAll(
-    { skip: "0", take: "100" }
-  );
+  const form = useForm<TechnologyFormValues>({
+    resolver: zodResolver(technologiesControllerCreateBody),
+    defaultValues: {
+      name: "",
+      icon: "",
+    },
+  });
+
+  const { data: response, isLoading } = useTechnologiesControllerFindAll({
+    skip: "0",
+    take: "100",
+  });
 
   const technologies = response?.data;
 
@@ -59,19 +78,22 @@ export default function TechnologiesPage() {
 
   const invalidateQueries = () => {
     queryClient.invalidateQueries({
-      queryKey: getTechnologiesControllerFindAllQueryKey({ skip: "0", take: "100" }),
+      queryKey: getTechnologiesControllerFindAllQueryKey({
+        skip: "0",
+        take: "100",
+      }),
     });
   };
 
   const handleOpenCreate = () => {
     setEditingTechnology(null);
-    setFormData({ name: "", icon: "" });
+    form.reset({ name: "", icon: "" });
     setIsDialogOpen(true);
   };
 
   const handleOpenEdit = (technology: TechnologyDto) => {
     setEditingTechnology(technology);
-    setFormData({ name: technology.name, icon: technology.icon || "" });
+    form.reset({ name: technology.name, icon: technology.icon || "" });
     setIsDialogOpen(true);
   };
 
@@ -80,12 +102,10 @@ export default function TechnologiesPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const payload: CreateTechnologyDto | UpdateTechnologyDto = {
-      name: formData.name,
-      icon: formData.icon || undefined,
+  const onSubmit = (values: TechnologyFormValues) => {
+    const payload = {
+      name: values.name,
+      icon: values.icon || undefined,
     };
 
     if (editingTechnology) {
@@ -100,7 +120,7 @@ export default function TechnologiesPage() {
       );
     } else {
       createMutation.mutate(
-        { data: payload as CreateTechnologyDto },
+        { data: payload },
         {
           onSuccess: () => {
             setIsDialogOpen(false);
@@ -162,7 +182,9 @@ export default function TechnologiesPage() {
             ) : technologies && technologies.length > 0 ? (
               technologies.map((technology) => (
                 <TableRow key={technology.id}>
-                  <TableCell className="font-medium">{technology.name}</TableCell>
+                  <TableCell className="font-medium">
+                    {technology.name}
+                  </TableCell>
                   <TableCell>{technology.icon || "-"}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -208,49 +230,58 @@ export default function TechnologiesPage() {
                 : "Add a new technology to your portfolio."}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  placeholder="e.g., React, TypeScript, Node.js"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="icon">Icon (optional)</Label>
-                <Input
-                  id="icon"
-                  value={formData.icon}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, icon: e.target.value }))
-                  }
-                  placeholder="e.g., react, typescript, nodejs"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending
-                  ? "Saving..."
-                  : editingTechnology
-                    ? "Update"
-                    : "Create"}
-              </Button>
-            </DialogFooter>
-          </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., React, TypeScript, Node.js"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="icon"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Icon (optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., react, typescript, nodejs"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending
+                    ? "Saving..."
+                    : editingTechnology
+                      ? "Update"
+                      : "Create"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -260,8 +291,8 @@ export default function TechnologiesPage() {
           <DialogHeader>
             <DialogTitle>Delete Technology</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;{deletingTechnology?.name}&quot;?
-              This action cannot be undone.
+              Are you sure you want to delete &quot;{deletingTechnology?.name}
+              &quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

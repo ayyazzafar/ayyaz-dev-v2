@@ -1,19 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Plus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { DataTable } from "@/components/ui/data-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 
 import {
@@ -27,6 +20,7 @@ import type { TechnologyDto } from "@/lib/api/schemas";
 import { technologiesControllerCreateBody } from "@/lib/api/generated/zod";
 
 import { TechnologyFormDialog } from "./_components/technology-form-dialog";
+import { createColumns } from "./_components/columns";
 
 type TechnologyFormValues = z.infer<typeof technologiesControllerCreateBody>;
 
@@ -43,7 +37,7 @@ export default function TechnologiesPage() {
     take: "100",
   });
 
-  const technologies = response?.data;
+  const technologies = response?.data ?? [];
 
   const createMutation = useTechnologiesControllerCreate();
   const updateMutation = useTechnologiesControllerUpdate();
@@ -117,6 +111,21 @@ export default function TechnologiesPage() {
     );
   };
 
+  const columns = useMemo(
+    () =>
+      createColumns({
+        onEdit: handleEdit,
+        onDelete: handleDeleteClick,
+      }),
+    []
+  );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">Loading...</div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -132,59 +141,12 @@ export default function TechnologiesPage() {
         </Button>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Icon</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={3} className="text-center py-8">
-                  Loading...
-                </TableCell>
-              </TableRow>
-            ) : technologies && technologies.length > 0 ? (
-              technologies.map((technology) => (
-                <TableRow key={technology.id}>
-                  <TableCell className="font-medium">
-                    {technology.name}
-                  </TableCell>
-                  <TableCell>{technology.icon || "-"}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(technology)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteClick(technology)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3} className="text-center py-8">
-                  No technologies found. Add your first one!
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={technologies}
+        searchKey="name"
+        searchPlaceholder="Search technologies..."
+      />
 
       <TechnologyFormDialog
         open={isFormOpen}

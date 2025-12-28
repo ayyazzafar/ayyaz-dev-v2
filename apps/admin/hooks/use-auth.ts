@@ -1,9 +1,29 @@
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import { LoginRequest, LoginResponse, User } from "@/types/auth";
+/**
+ * Authentication hooks and utilities
+ *
+ * This module provides:
+ * - Token storage utilities (localStorage)
+ * - Re-exports of Orval-generated auth hooks
+ * - Logout functionality
+ */
+
+// Re-export Orval-generated hooks and types
+export {
+  useAuthControllerLogin,
+  useAuthControllerGetMe,
+  authControllerLogin,
+  authControllerGetMe,
+} from "@/lib/api/generated/auth/auth";
+
+export type {
+  LoginDto,
+  LoginResponseDto,
+  UserResponseDto
+} from "@/lib/api/schemas";
 
 const TOKEN_KEY = "admin_token";
 
+// Token storage utilities
 export function getStoredToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(TOKEN_KEY);
@@ -17,36 +37,7 @@ export function removeStoredToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
-async function loginApi(credentials: LoginRequest): Promise<LoginResponse> {
-  return api<LoginResponse>("/auth/login", {
-    method: "POST",
-    body: JSON.stringify(credentials),
-  });
-}
-
-async function getMeApi(token: string): Promise<User> {
-  return api<User>("/auth/me", { token });
-}
-
-export function useLogin() {
-  return useMutation({
-    mutationFn: loginApi,
-    onSuccess: (data) => {
-      setStoredToken(data.access_token);
-    },
-  });
-}
-
-export function useGetMe() {
-  return useMutation({
-    mutationFn: () => {
-      const token = getStoredToken();
-      if (!token) throw new Error("No token");
-      return getMeApi(token);
-    },
-  });
-}
-
+// Logout utility
 export function useLogout() {
   return () => {
     removeStoredToken();

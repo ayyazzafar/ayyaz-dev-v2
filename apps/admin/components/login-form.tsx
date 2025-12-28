@@ -13,7 +13,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useLogin, getStoredToken } from "@/hooks/use-auth";
+import { useAuthControllerLogin, getStoredToken, setStoredToken } from "@/hooks/use-auth";
 
 export function LoginForm({
   className,
@@ -23,7 +23,7 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const loginMutation = useLogin();
+  const loginMutation = useAuthControllerLogin();
 
   useEffect(() => {
     const token = getStoredToken();
@@ -35,9 +35,10 @@ export function LoginForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     loginMutation.mutate(
-      { email, password },
+      { data: { email, password } },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          setStoredToken(data.access_token);
           router.push("/dashboard");
         },
       }
@@ -59,7 +60,9 @@ export function LoginForm({
 
               {loginMutation.isError && (
                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                  {loginMutation.error?.message || "Login failed"}
+                  {loginMutation.error instanceof Error
+                    ? loginMutation.error.message
+                    : "Login failed"}
                 </div>
               )}
 

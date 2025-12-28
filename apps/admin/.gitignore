@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# orval generated files (regenerate with: bun run generate-api)
+/lib/api/generated/
+/lib/api/schemas/

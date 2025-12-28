@@ -8,12 +8,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard, JwtAuthGuard } from './guards';
 import { CurrentUser, Public } from './decorators';
-import { LoginDto } from './dto';
+import { LoginDto, LoginResponseDto, UserResponseDto } from './dto';
 
 /**
  * AuthController - Authentication endpoints
@@ -64,7 +64,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK) // Return 200, not 201
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiBody({ type: LoginDto })  // Needed because LocalAuthGuard consumes the body
-  async login(@Request() req: { user: Omit<User, 'password'> }) {
+  @ApiOkResponse({ type: LoginResponseDto, description: 'Login successful' })
+  async login(@Request() req: { user: Omit<User, 'password'> }): Promise<LoginResponseDto> {
     // req.user is set by LocalAuthGuard after successful validation
     return this.authService.login(req.user);
   }
@@ -84,7 +85,8 @@ export class AuthController {
   @Get('me')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current authenticated user profile' })
-  getMe(@CurrentUser() user: Omit<User, 'password'>) {
-    return user;
+  @ApiOkResponse({ type: UserResponseDto, description: 'Current user profile' })
+  getMe(@CurrentUser() user: Omit<User, 'password'>): UserResponseDto {
+    return user as UserResponseDto;
   }
 }

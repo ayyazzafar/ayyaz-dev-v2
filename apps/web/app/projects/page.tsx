@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getProjects } from "@/lib/api";
+import { getProjects, type Project } from "@/lib/api";
 
 export const metadata = {
   title: "Projects | Ayyaz Zafar",
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function ProjectsPage() {
-  let projects = [];
+  let projects: Project[] = [];
 
   try {
     projects = await getProjects();
@@ -38,7 +38,7 @@ export default async function ProjectsPage() {
                   {project.images && project.images.length > 0 && (
                     <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
                       <img
-                        src={project.images[0].url}
+                        src={project.images[0]?.url}
                         alt={project.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getProjectBySlug } from "@/lib/api";
+import { getProjectBySlug, type Project } from "@/lib/api";
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: ProjectPageProps) {
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  let project;
+  let project: Project;
 
   try {
     project = await getProjectBySlug(slug);
@@ -84,7 +84,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             {/* Main/Cover Image */}
             <div className="aspect-video bg-muted rounded-lg overflow-hidden">
               <img
-                src={project.images[0].url}
+                src={project.images[0]?.url}
                 alt={project.title}
                 className="w-full h-full object-cover"
               />

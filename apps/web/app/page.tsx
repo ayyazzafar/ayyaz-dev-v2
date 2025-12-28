@@ -2,10 +2,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getFeaturedProjects } from "@/lib/api";
+import { getFeaturedProjects, type Project, type Technology } from "@/lib/api";
 
 export default async function HomePage() {
-  let featuredProjects = [];
+  let featuredProjects: Project[] = [];
 
   try {
     featuredProjects = await getFeaturedProjects();
@@ -56,7 +56,7 @@ export default async function HomePage() {
                     {project.images && project.images.length > 0 && (
                       <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
                         <img
-                          src={project.images[0].url}
+                          src={project.images[0]?.url}
                           alt={project.title}
                           className="w-full h-full object-cover"
                         />

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getSkillsGrouped, getExperience } from "@/lib/api";
+import { getSkillsGrouped, getExperience, type GroupedSkills, type Experience } from "@/lib/api";
 
 export const metadata = {
   title: "About | Ayyaz Zafar",
@@ -22,8 +22,8 @@ const categoryLabels: Record<string, string> = {
 const categoryOrder = ["FRONTEND", "BACKEND", "DATABASE", "DEVOPS", "TOOLS", "AI"];
 
 export default async function AboutPage() {
-  let skills: Record<string, any[]> = {};
-  let experience: any[] = [];
+  let skills: GroupedSkills = {};
+  let experience: Experience[] = [];
 
   try {
     [skills, experience] = await Promise.all([
@@ -97,7 +97,7 @@ export default async function AboutPage() {
                   <CardContent>
                     <div className="space-y-3">
                       {skills[category]
-                        .sort((a, b) => b.level - a.level)
+                        ?.sort((a, b) => b.level - a.level)
                         .map((skill) => (
                           <div key={skill.id} className="space-y-1">
                             <div className="flex justify-between text-sm">

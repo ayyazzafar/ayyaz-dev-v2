@@ -17,7 +17,7 @@ import {
   getSkillsControllerFindAllQueryKey,
 } from "@/lib/api/generated/skills/skills";
 import type { SkillDto } from "@/lib/api/schemas";
-import { skillsControllerCreateBody } from "@/lib/api/generated/zod";
+import { skillsControllerCreateBody } from "@ayyaz-dev/api-client";
 
 import { SkillFormDialog } from "./_components/skill-form-dialog";
 import { createColumns } from "./_components/columns";

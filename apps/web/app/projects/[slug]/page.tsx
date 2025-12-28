@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getProjectBySlug, type Project } from "@/lib/api";
+import { getProjectBySlug, type ProjectDto } from "@/lib/api";
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: ProjectPageProps) {
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  let project: Project;
+  let project: ProjectDto;
 
   try {
     project = await getProjectBySlug(slug);

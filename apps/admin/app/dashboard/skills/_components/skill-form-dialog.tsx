@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 
-import { skillsControllerCreateBody } from "@/lib/api/generated/zod";
+import { skillsControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { SkillDto } from "@/lib/api/schemas";
 import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
 

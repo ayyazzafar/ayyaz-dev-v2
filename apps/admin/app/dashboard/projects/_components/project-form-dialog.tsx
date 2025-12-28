@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
-import { projectsControllerCreateBody } from "@/lib/api/generated/zod";
+import { projectsControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { ProjectDto } from "@/lib/api/schemas";
 import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
 

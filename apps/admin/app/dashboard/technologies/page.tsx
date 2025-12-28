@@ -17,7 +17,7 @@ import {
   getTechnologiesControllerFindAllQueryKey,
 } from "@/lib/api/generated/technologies/technologies";
 import type { TechnologyDto } from "@/lib/api/schemas";
-import { technologiesControllerCreateBody } from "@/lib/api/generated/zod";
+import { technologiesControllerCreateBody } from "@ayyaz-dev/api-client";
 
 import { TechnologyFormDialog } from "./_components/technology-form-dialog";
 import { createColumns } from "./_components/columns";

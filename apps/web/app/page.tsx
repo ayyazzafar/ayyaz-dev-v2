@@ -2,10 +2,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getFeaturedProjects, type Project, type Technology } from "@/lib/api";
+import { getFeaturedProjects, type ProjectDto } from "@/lib/api";
 
 export default async function HomePage() {
-  let featuredProjects: Project[] = [];
+  let featuredProjects: ProjectDto[] = [];
 
   try {
     featuredProjects = await getFeaturedProjects();

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getProjects, type Project } from "@/lib/api";
+import { getProjects, type ProjectDto } from "@/lib/api";
 
 export const metadata = {
   title: "Projects | Ayyaz Zafar",
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function ProjectsPage() {
-  let projects: Project[] = [];
+  let projects: ProjectDto[] = [];
 
   try {
     projects = await getProjects();

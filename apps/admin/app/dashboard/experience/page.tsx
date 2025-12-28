@@ -17,7 +17,7 @@ import {
   getExperienceControllerFindAllQueryKey,
 } from "@/lib/api/generated/experience/experience";
 import type { ExperienceDto } from "@/lib/api/schemas";
-import { experienceControllerCreateBody } from "@/lib/api/generated/zod";
+import { experienceControllerCreateBody } from "@ayyaz-dev/api-client";
 
 import { ExperienceFormDialog } from "./_components/experience-form-dialog";
 import { createColumns } from "./_components/columns";

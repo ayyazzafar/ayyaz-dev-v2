@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { technologiesControllerCreateBody } from "@/lib/api/generated/zod";
+import { technologiesControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { TechnologyDto } from "@/lib/api/schemas";
 import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
 

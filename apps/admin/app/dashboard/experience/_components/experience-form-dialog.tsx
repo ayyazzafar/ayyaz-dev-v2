@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 
-import { experienceControllerCreateBody } from "@/lib/api/generated/zod";
+import { experienceControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { ExperienceDto } from "@/lib/api/schemas";
 import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
 

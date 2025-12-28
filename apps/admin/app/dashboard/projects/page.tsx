@@ -17,7 +17,7 @@ import {
   getProjectsControllerFindAllQueryKey,
 } from "@/lib/api/generated/projects/projects";
 import type { ProjectDto } from "@/lib/api/schemas";
-import { projectsControllerCreateBody } from "@/lib/api/generated/zod";
+import { projectsControllerCreateBody } from "@ayyaz-dev/api-client";
 
 import { ProjectFormDialog } from "./_components/project-form-dialog";
 import { createColumns } from "./_components/columns";

@@ -2,6 +2,7 @@ import { defineConfig } from "orval";
 
 export default defineConfig({
   // React Query hooks generation
+  // Note: Zod schemas are now imported from @ayyaz-dev/api-client
   api: {
     input: {
       target: "http://localhost:4000/docs-json",
@@ -23,17 +24,6 @@ export default defineConfig({
           signal: true,
         },
       },
-    },
-  },
-  // Zod schemas generation (in same generated folder)
-  zod: {
-    input: {
-      target: "http://localhost:4000/docs-json",
-    },
-    output: {
-      mode: "single",
-      target: "./lib/api/generated/zod.ts",
-      client: "zod",
     },
   },
 });

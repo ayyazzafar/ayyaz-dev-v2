@@ -11,21 +11,14 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { SkillsService } from './skills.service';
-import { CreateSkillDto, UpdateSkillDto, SkillCategory } from './dto';
+import { CreateSkillDto, UpdateSkillDto, SkillCategory, SkillDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards';
 import { Public } from '../auth/decorators';
 
 /**
  * SkillsController - HTTP endpoints for skill management
- *
- * Public:
- * - GET /skills - List all skills
- * - GET /skills/grouped - Skills grouped by category
- *
- * Protected:
- * - POST/PATCH/DELETE - Admin only
  */
 @ApiTags('skills')
 @Controller('skills')
@@ -33,47 +26,59 @@ import { Public } from '../auth/decorators';
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
+  /**
+   * Create a new skill
+   */
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create a new skill' })
-  create(@Body() createSkillDto: CreateSkillDto) {
+  create(@Body() createSkillDto: CreateSkillDto): Promise<SkillDto> {
     return this.skillsService.create(createSkillDto);
   }
 
+  /**
+   * List all skills
+   */
   @Public()
   @Get()
-  @ApiOperation({ summary: 'List all skills' })
   @ApiQuery({ name: 'category', enum: SkillCategory, required: false })
-  findAll(@Query('category') category?: SkillCategory) {
+  findAll(@Query('category') category?: SkillCategory): Promise<SkillDto[]> {
     return this.skillsService.findAll(category);
   }
 
+  /**
+   * Get skills grouped by category
+   */
   @Public()
   @Get('grouped')
-  @ApiOperation({ summary: 'Get skills grouped by category' })
-  findGrouped() {
+  findGrouped(): Promise<Record<string, SkillDto[]>> {
     return this.skillsService.findGrouped();
   }
 
+  /**
+   * Get a skill by ID
+   */
   @Public()
   @Get(':id')
-  @ApiOperation({ summary: 'Get a skill by ID' })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<SkillDto> {
     return this.skillsService.findOne(id);
   }
 
+  /**
+   * Update a skill
+   */
   @Patch(':id')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Update a skill' })
-  update(@Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
+  update(@Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto): Promise<SkillDto> {
     return this.skillsService.update(id, updateSkillDto);
   }
 
+  /**
+   * Delete a skill
+   */
   @Delete(':id')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Delete a skill' })
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<SkillDto> {
     return this.skillsService.remove(id);
   }
 }

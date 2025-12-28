@@ -1,12 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
-
+/**
+ * TechnologyDto - Response DTO for a technology
+ */
 export class TechnologyDto {
-  @ApiProperty({ description: 'Technology ID' })
+  /** Technology ID */
   id: string;
 
-  @ApiProperty({ description: 'Technology name' })
+  /** Technology name */
   name: string;
 
-  @ApiProperty({ description: 'Icon identifier', nullable: true })
+  /** Icon identifier */
   icon: string | null;
 }

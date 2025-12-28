@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { ProjectStatus, ProjectType } from './create-project.dto';
 import { ProjectImageDto } from './update-project.dto';
 
@@ -6,13 +5,13 @@ import { ProjectImageDto } from './update-project.dto';
  * ProjectTechnologyDto - Response DTO for project technologies
  */
 export class ProjectTechnologyDto {
-  @ApiProperty({ description: 'Technology ID' })
+  /** Technology ID */
   id: string;
 
-  @ApiProperty({ description: 'Technology name' })
+  /** Technology name */
   name: string;
 
-  @ApiProperty({ description: 'Icon identifier', nullable: true })
+  /** Icon identifier */
   icon: string | null;
 }
 
@@ -20,54 +19,54 @@ export class ProjectTechnologyDto {
  * ProjectDto - Response DTO for a single project
  */
 export class ProjectDto {
-  @ApiProperty({ description: 'Project ID' })
+  /** Project ID */
   id: string;
 
-  @ApiProperty({ description: 'URL-friendly slug' })
+  /** URL-friendly slug */
   slug: string;
 
-  @ApiProperty({ description: 'Display title' })
+  /** Display title */
   title: string;
 
-  @ApiProperty({ description: 'Short description', nullable: true })
+  /** Short description */
   description: string | null;
 
-  @ApiProperty({ description: 'Full description', nullable: true })
+  /** Full description */
   longDescription: string | null;
 
-  @ApiProperty({ enum: ProjectStatus, description: 'Project status' })
+  /** Project status */
   status: ProjectStatus;
 
-  @ApiProperty({ enum: ProjectType, description: 'Project type' })
+  /** Project type */
   type: ProjectType;
 
-  @ApiProperty({ description: 'Live project URL', nullable: true })
+  /** Live project URL */
   url: string | null;
 
-  @ApiProperty({ description: 'GitHub repository URL', nullable: true })
+  /** GitHub repository URL */
   github: string | null;
 
-  @ApiProperty({ description: 'Featured on homepage' })
+  /** Featured on homepage */
   featured: boolean;
 
-  @ApiProperty({ description: 'Display order' })
+  /** Display order */
   order: number;
 
-  @ApiProperty({ description: 'When project was started', nullable: true })
+  /** When project was started */
   startedAt: Date | null;
 
-  @ApiProperty({ description: 'When project was completed', nullable: true })
+  /** When project was completed */
   completedAt: Date | null;
 
-  @ApiProperty({ description: 'Creation timestamp' })
+  /** Creation timestamp */
   createdAt: Date;
 
-  @ApiProperty({ description: 'Last update timestamp' })
+  /** Last update timestamp */
   updatedAt: Date;
 
-  @ApiProperty({ type: [ProjectTechnologyDto], description: 'Associated technologies' })
+  /** Associated technologies */
   technologies?: ProjectTechnologyDto[];
 
-  @ApiProperty({ type: [ProjectImageDto], description: 'Project images' })
+  /** Project images */
   images?: ProjectImageDto[];
 }

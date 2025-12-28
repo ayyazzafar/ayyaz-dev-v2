@@ -1,15 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
-
+/**
+ * UserResponseDto - Response DTO for user data (excludes password)
+ */
 export class UserResponseDto {
-  @ApiProperty({ description: 'User ID' })
+  /** User ID */
   id: string;
 
-  @ApiProperty({ description: 'User email' })
+  /** User email */
   email: string;
 
-  @ApiProperty({ description: 'User name', nullable: true })
+  /** User name */
   name: string | null;
 
-  @ApiProperty({ description: 'User role', enum: ['ADMIN', 'VIEWER'] })
+  /** User role */
   role: 'ADMIN' | 'VIEWER';
 }

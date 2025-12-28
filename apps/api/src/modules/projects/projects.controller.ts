@@ -11,9 +11,9 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
-import { CreateProjectDto, UpdateProjectDto, QueryProjectDto } from './dto';
+import { CreateProjectDto, UpdateProjectDto, QueryProjectDto, ProjectDto, ProjectListResponseDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards';
 import { Public } from '../auth/decorators';
 
@@ -67,9 +67,10 @@ export class ProjectsController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiBearerAuth('JWT-auth')  // Shows lock icon, requires auth
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new project' })
-  create(@Body() createProjectDto: CreateProjectDto) {
+  @ApiCreatedResponse({ type: ProjectDto, description: 'Project created successfully' })
+  create(@Body() createProjectDto: CreateProjectDto): Promise<ProjectDto> {
     return this.projectsService.create(createProjectDto);
   }
 
@@ -84,7 +85,8 @@ export class ProjectsController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'List all projects with optional filters' })
-  findAll(@Query() query: QueryProjectDto) {
+  @ApiOkResponse({ type: ProjectListResponseDto, description: 'Paginated list of projects' })
+  findAll(@Query() query: QueryProjectDto): Promise<ProjectListResponseDto> {
     return this.projectsService.findAll(query);
   }
 
@@ -97,7 +99,8 @@ export class ProjectsController {
   @Public()
   @Get('featured')
   @ApiOperation({ summary: 'Get featured projects for homepage' })
-  findFeatured() {
+  @ApiOkResponse({ type: [ProjectDto], description: 'List of featured projects' })
+  findFeatured(): Promise<ProjectDto[]> {
     return this.projectsService.findFeatured();
   }
 
@@ -114,7 +117,8 @@ export class ProjectsController {
   @Public()
   @Get(':idOrSlug')
   @ApiOperation({ summary: 'Get a project by ID or slug' })
-  async findOne(@Param('idOrSlug') idOrSlug: string) {
+  @ApiOkResponse({ type: ProjectDto, description: 'Project found' })
+  async findOne(@Param('idOrSlug') idOrSlug: string): Promise<ProjectDto> {
     // Try slug first (more common for public access)
     try {
       return await this.projectsService.findBySlug(idOrSlug);
@@ -133,7 +137,8 @@ export class ProjectsController {
   @Patch(':id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update a project' })
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
+  @ApiOkResponse({ type: ProjectDto, description: 'Project updated successfully' })
+  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto): Promise<ProjectDto> {
     return this.projectsService.update(id, updateProjectDto);
   }
 
@@ -146,7 +151,8 @@ export class ProjectsController {
   @Delete(':id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a project' })
-  remove(@Param('id') id: string) {
+  @ApiOkResponse({ type: ProjectDto, description: 'Project deleted successfully' })
+  remove(@Param('id') id: string): Promise<ProjectDto> {
     return this.projectsService.remove(id);
   }
 }

@@ -10,67 +10,60 @@ import { DataTable } from "@/components/ui/data-table";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
 
 import {
-  useTechnologiesControllerFindAll,
-  useTechnologiesControllerCreate,
-  useTechnologiesControllerUpdate,
-  useTechnologiesControllerRemove,
-  getTechnologiesControllerFindAllQueryKey,
-} from "@/lib/api/generated/technologies/technologies";
-import type { TechnologyDto } from "@/lib/api/schemas";
-import { technologiesControllerCreateBody } from "@/lib/api/generated/zod";
+  useProjectsControllerFindAll,
+  useProjectsControllerCreate,
+  useProjectsControllerUpdate,
+  useProjectsControllerRemove,
+  getProjectsControllerFindAllQueryKey,
+} from "@/lib/api/generated/projects/projects";
+import type { ProjectDto } from "@/lib/api/schemas";
+import { projectsControllerCreateBody } from "@/lib/api/generated/zod";
 
-import { TechnologyFormDialog } from "./_components/technology-form-dialog";
+import { ProjectFormDialog } from "./_components/project-form-dialog";
 import { createColumns } from "./_components/columns";
 
-type TechnologyFormValues = z.infer<typeof technologiesControllerCreateBody>;
+type ProjectFormValues = z.infer<typeof projectsControllerCreateBody>;
 
-export default function TechnologiesPage() {
+export default function ProjectsPage() {
   const queryClient = useQueryClient();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedTechnology, setSelectedTechnology] =
-    useState<TechnologyDto | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectDto | null>(null);
 
-  const { data: response, isLoading } = useTechnologiesControllerFindAll({
-    skip: "0",
-    take: "100",
-  });
+  const { data: response, isLoading } = useProjectsControllerFindAll();
 
-  const technologies = response?.data ?? [];
+  const projects = response?.data ?? [];
 
-  const createMutation = useTechnologiesControllerCreate();
-  const updateMutation = useTechnologiesControllerUpdate();
-  const deleteMutation = useTechnologiesControllerRemove();
+  const createMutation = useProjectsControllerCreate();
+  const updateMutation = useProjectsControllerUpdate();
+  const deleteMutation = useProjectsControllerRemove();
 
   const invalidateQueries = () => {
     queryClient.invalidateQueries({
-      queryKey: getTechnologiesControllerFindAllQueryKey({
-        skip: "0",
-        take: "100",
-      }),
+      queryKey: getProjectsControllerFindAllQueryKey(),
     });
   };
 
   const handleCreate = () => {
-    setSelectedTechnology(null);
+    setSelectedProject(null);
     setIsFormOpen(true);
   };
 
-  const handleEdit = (technology: TechnologyDto) => {
-    setSelectedTechnology(technology);
+  const handleEdit = (project: ProjectDto) => {
+    setSelectedProject(project);
     setIsFormOpen(true);
   };
 
-  const handleDeleteClick = (technology: TechnologyDto) => {
-    setSelectedTechnology(technology);
+  const handleDeleteClick = (project: ProjectDto) => {
+    setSelectedProject(project);
     setIsDeleteOpen(true);
   };
 
-  const handleFormSubmit = (values: TechnologyFormValues) => {
-    if (selectedTechnology) {
+  const handleFormSubmit = (values: ProjectFormValues) => {
+    if (selectedProject) {
       updateMutation.mutate(
-        { id: selectedTechnology.id, data: values },
+        { id: selectedProject.id, data: values },
         {
           onSuccess: () => {
             setIsFormOpen(false);
@@ -92,14 +85,14 @@ export default function TechnologiesPage() {
   };
 
   const handleDeleteConfirm = () => {
-    if (!selectedTechnology) return;
+    if (!selectedProject) return;
 
     deleteMutation.mutate(
-      { id: selectedTechnology.id },
+      { id: selectedProject.id },
       {
         onSuccess: () => {
           setIsDeleteOpen(false);
-          setSelectedTechnology(null);
+          setSelectedProject(null);
           invalidateQueries();
         },
       }
@@ -125,28 +118,28 @@ export default function TechnologiesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Technologies</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
           <p className="text-muted-foreground">
-            Manage the technologies displayed on your portfolio
+            Manage the projects displayed on your portfolio
           </p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Technology
+          Add Project
         </Button>
       </div>
 
       <DataTable
         columns={columns}
-        data={technologies}
-        searchKey="name"
-        searchPlaceholder="Search technologies..."
+        data={projects}
+        searchKey="title"
+        searchPlaceholder="Search projects..."
       />
 
-      <TechnologyFormDialog
+      <ProjectFormDialog
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        technology={selectedTechnology}
+        project={selectedProject}
         onSubmit={handleFormSubmit}
         isPending={createMutation.isPending || updateMutation.isPending}
       />
@@ -154,8 +147,8 @@ export default function TechnologiesPage() {
       <DeleteConfirmDialog
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
-        title="Delete Technology"
-        description={`Are you sure you want to delete "${selectedTechnology?.name}"? This action cannot be undone.`}
+        title="Delete Project"
+        description={`Are you sure you want to delete "${selectedProject?.title}"? This action cannot be undone.`}
         onConfirm={handleDeleteConfirm}
         isPending={deleteMutation.isPending}
       />

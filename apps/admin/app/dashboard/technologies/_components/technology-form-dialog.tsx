@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 
 import { technologiesControllerCreateBody } from "@/lib/api/generated/zod";
 import type { TechnologyDto } from "@/lib/api/schemas";
+import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
 
 type TechnologyFormValues = z.infer<typeof technologiesControllerCreateBody>;
 
@@ -48,19 +49,13 @@ export function TechnologyFormDialog({
 
   const form = useForm<TechnologyFormValues>({
     resolver: zodResolver(technologiesControllerCreateBody),
-    defaultValues: {
-      name: "",
-      icon: "",
-    },
+    defaultValues: getZodDefaults(technologiesControllerCreateBody),
   });
 
   // Reset form when dialog opens with technology data
   useEffect(() => {
     if (open) {
-      form.reset({
-        name: technology?.name || "",
-        icon: technology?.icon || "",
-      });
+      form.reset(mapEntityToFormValues(technologiesControllerCreateBody, technology));
     }
   }, [open, technology, form]);
 

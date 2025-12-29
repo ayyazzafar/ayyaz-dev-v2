@@ -27,18 +27,6 @@ import type {
 /**
  * @summary Create a new project
  */
-export type projectsControllerCreateResponse201 = {
-  data: ProjectDto
-  status: 201
-}
-    
-export type projectsControllerCreateResponseSuccess = (projectsControllerCreateResponse201) & {
-  headers: Headers;
-};
-;
-
-export type projectsControllerCreateResponse = (projectsControllerCreateResponseSuccess)
-
 export const getProjectsControllerCreateUrl = () => {
 
 
@@ -47,7 +35,7 @@ export const getProjectsControllerCreateUrl = () => {
   return `/api/projects`
 }
 
-export const projectsControllerCreate = async (createProjectDto: CreateProjectDto, options?: RequestInit): Promise<projectsControllerCreateResponse> => {
+export const projectsControllerCreate = async (createProjectDto: CreateProjectDto, options?: RequestInit): Promise<ProjectDto> => {
   
   const res = await fetch(getProjectsControllerCreateUrl(),
   {      
@@ -61,26 +49,14 @@ export const projectsControllerCreate = async (createProjectDto: CreateProjectDt
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: projectsControllerCreateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as projectsControllerCreateResponse
+  const data: ProjectDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary List all projects with optional filters
  */
-export type projectsControllerFindAllResponse200 = {
-  data: ProjectListResponseDto
-  status: 200
-}
-    
-export type projectsControllerFindAllResponseSuccess = (projectsControllerFindAllResponse200) & {
-  headers: Headers;
-};
-;
-
-export type projectsControllerFindAllResponse = (projectsControllerFindAllResponseSuccess)
-
 export const getProjectsControllerFindAllUrl = (params?: ProjectsControllerFindAllParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -96,7 +72,7 @@ export const getProjectsControllerFindAllUrl = (params?: ProjectsControllerFindA
   return stringifiedParams.length > 0 ? `/api/projects?${stringifiedParams}` : `/api/projects`
 }
 
-export const projectsControllerFindAll = async (params?: ProjectsControllerFindAllParams, options?: RequestInit): Promise<projectsControllerFindAllResponse> => {
+export const projectsControllerFindAll = async (params?: ProjectsControllerFindAllParams, options?: RequestInit): Promise<ProjectListResponseDto> => {
   
   const res = await fetch(getProjectsControllerFindAllUrl(params),
   {      
@@ -109,26 +85,14 @@ export const projectsControllerFindAll = async (params?: ProjectsControllerFindA
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: projectsControllerFindAllResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as projectsControllerFindAllResponse
+  const data: ProjectListResponseDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Get featured projects for homepage
  */
-export type projectsControllerFindFeaturedResponse200 = {
-  data: ProjectDto[]
-  status: 200
-}
-    
-export type projectsControllerFindFeaturedResponseSuccess = (projectsControllerFindFeaturedResponse200) & {
-  headers: Headers;
-};
-;
-
-export type projectsControllerFindFeaturedResponse = (projectsControllerFindFeaturedResponseSuccess)
-
 export const getProjectsControllerFindFeaturedUrl = () => {
 
 
@@ -137,7 +101,7 @@ export const getProjectsControllerFindFeaturedUrl = () => {
   return `/api/projects/featured`
 }
 
-export const projectsControllerFindFeatured = async ( options?: RequestInit): Promise<projectsControllerFindFeaturedResponse> => {
+export const projectsControllerFindFeatured = async ( options?: RequestInit): Promise<ProjectDto[]> => {
   
   const res = await fetch(getProjectsControllerFindFeaturedUrl(),
   {      
@@ -150,26 +114,14 @@ export const projectsControllerFindFeatured = async ( options?: RequestInit): Pr
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: projectsControllerFindFeaturedResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as projectsControllerFindFeaturedResponse
+  const data: ProjectDto[] = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Get a project by ID or slug
  */
-export type projectsControllerFindOneResponse200 = {
-  data: ProjectDto
-  status: 200
-}
-    
-export type projectsControllerFindOneResponseSuccess = (projectsControllerFindOneResponse200) & {
-  headers: Headers;
-};
-;
-
-export type projectsControllerFindOneResponse = (projectsControllerFindOneResponseSuccess)
-
 export const getProjectsControllerFindOneUrl = (idOrSlug: string,) => {
 
 
@@ -178,7 +130,7 @@ export const getProjectsControllerFindOneUrl = (idOrSlug: string,) => {
   return `/api/projects/${idOrSlug}`
 }
 
-export const projectsControllerFindOne = async (idOrSlug: string, options?: RequestInit): Promise<projectsControllerFindOneResponse> => {
+export const projectsControllerFindOne = async (idOrSlug: string, options?: RequestInit): Promise<ProjectDto> => {
   
   const res = await fetch(getProjectsControllerFindOneUrl(idOrSlug),
   {      
@@ -191,26 +143,14 @@ export const projectsControllerFindOne = async (idOrSlug: string, options?: Requ
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: projectsControllerFindOneResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as projectsControllerFindOneResponse
+  const data: ProjectDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Update a project
  */
-export type projectsControllerUpdateResponse200 = {
-  data: ProjectDto
-  status: 200
-}
-    
-export type projectsControllerUpdateResponseSuccess = (projectsControllerUpdateResponse200) & {
-  headers: Headers;
-};
-;
-
-export type projectsControllerUpdateResponse = (projectsControllerUpdateResponseSuccess)
-
 export const getProjectsControllerUpdateUrl = (id: string,) => {
 
 
@@ -220,7 +160,7 @@ export const getProjectsControllerUpdateUrl = (id: string,) => {
 }
 
 export const projectsControllerUpdate = async (id: string,
-    updateProjectDto: UpdateProjectDto, options?: RequestInit): Promise<projectsControllerUpdateResponse> => {
+    updateProjectDto: UpdateProjectDto, options?: RequestInit): Promise<ProjectDto> => {
   
   const res = await fetch(getProjectsControllerUpdateUrl(id),
   {      
@@ -234,26 +174,14 @@ export const projectsControllerUpdate = async (id: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: projectsControllerUpdateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as projectsControllerUpdateResponse
+  const data: ProjectDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Delete a project
  */
-export type projectsControllerRemoveResponse200 = {
-  data: ProjectDto
-  status: 200
-}
-    
-export type projectsControllerRemoveResponseSuccess = (projectsControllerRemoveResponse200) & {
-  headers: Headers;
-};
-;
-
-export type projectsControllerRemoveResponse = (projectsControllerRemoveResponseSuccess)
-
 export const getProjectsControllerRemoveUrl = (id: string,) => {
 
 
@@ -262,7 +190,7 @@ export const getProjectsControllerRemoveUrl = (id: string,) => {
   return `/api/projects/${id}`
 }
 
-export const projectsControllerRemove = async (id: string, options?: RequestInit): Promise<projectsControllerRemoveResponse> => {
+export const projectsControllerRemove = async (id: string, options?: RequestInit): Promise<ProjectDto> => {
   
   const res = await fetch(getProjectsControllerRemoveUrl(id),
   {      
@@ -275,8 +203,8 @@ export const projectsControllerRemove = async (id: string, options?: RequestInit
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: projectsControllerRemoveResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as projectsControllerRemoveResponse
+  const data: ProjectDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 

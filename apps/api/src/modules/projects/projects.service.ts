@@ -2,8 +2,11 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+import { FileUploadService } from '@ayyaz-dev/file-upload/server';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateProjectDto,
@@ -39,7 +42,54 @@ import {
  */
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(ProjectsService.name);
+  private readonly r2PublicUrl: string;
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly fileUploadService: FileUploadService,
+    private readonly configService: ConfigService,
+  ) {
+    this.r2PublicUrl = this.configService.getOrThrow<string>('R2_PUBLIC_URL');
+  }
+
+  /**
+   * Extract R2 storage key from a public URL
+   *
+   * @example
+   * // publicUrl: https://media.ayyaz.dev
+   * // imageUrl: https://media.ayyaz.dev/uploads/abc123.jpg
+   * // returns: uploads/abc123.jpg
+   */
+  private extractKeyFromUrl(imageUrl: string): string | null {
+    if (!imageUrl.startsWith(this.r2PublicUrl)) {
+      return null; // Not an R2 URL, skip
+    }
+    // Remove the public URL prefix and leading slash
+    const key = imageUrl.replace(this.r2PublicUrl, '').replace(/^\//, '');
+    return key || null;
+  }
+
+  /**
+   * Delete multiple files from R2 storage
+   * Logs errors but doesn't throw (cleanup shouldn't block the main operation)
+   */
+  private async deleteFilesFromStorage(urls: string[]): Promise<void> {
+    const deletePromises = urls.map(async (url) => {
+      const key = this.extractKeyFromUrl(url);
+      if (key) {
+        try {
+          await this.fileUploadService.deleteFile(key);
+          this.logger.log(`Deleted file from R2: ${key}`);
+        } catch (error) {
+          // Log but don't throw - cleanup failure shouldn't block the operation
+          this.logger.warn(`Failed to delete file from R2: ${key}`, error);
+        }
+      }
+    });
+
+    await Promise.all(deletePromises);
+  }
 
   /**
    * Default include for fetching projects with relations
@@ -275,7 +325,26 @@ export class ProjectsService {
 
     // If images array is provided, replace all existing images
     if (images !== undefined) {
-      // Delete existing images
+      // Get existing images to clean up from R2
+      const existingImages = await this.prisma.projectImage.findMany({
+        where: { projectId: id },
+        select: { url: true },
+      });
+
+      // Find images that are being removed (not in the new array)
+      const newImageUrls = new Set(images.map((img) => img.url));
+      const urlsToDelete = existingImages
+        .map((img) => img.url)
+        .filter((url) => !newImageUrls.has(url));
+
+      // Delete removed images from R2 storage (non-blocking)
+      if (urlsToDelete.length > 0) {
+        this.deleteFilesFromStorage(urlsToDelete).catch((err) =>
+          this.logger.warn('R2 cleanup failed during project update', err),
+        );
+      }
+
+      // Delete existing images from database
       await this.prisma.projectImage.deleteMany({
         where: { projectId: id },
       });
@@ -309,15 +378,33 @@ export class ProjectsService {
    * Cascade delete handles:
    * - ProjectTechnology connections (defined in schema)
    * - ProjectImage records (defined in schema)
+   *
+   * Also cleans up images from R2 storage
    */
   async remove(id: string) {
-    // Check if project exists
-    await this.findOne(id);
+    // Check if project exists and get images for R2 cleanup
+    const existingProject = await this.prisma.project.findUnique({
+      where: { id },
+      include: { images: { select: { url: true } } },
+    });
 
+    if (!existingProject) {
+      throw new NotFoundException(`Project with ID "${id}" not found`);
+    }
+
+    // Delete project (cascade deletes images from database)
     const project = await this.prisma.project.delete({
       where: { id },
       include: this.defaultInclude,
     });
+
+    // Cleanup R2 storage (non-blocking)
+    if (existingProject.images.length > 0) {
+      const urlsToDelete = existingProject.images.map((img) => img.url);
+      this.deleteFilesFromStorage(urlsToDelete).catch((err) =>
+        this.logger.warn('R2 cleanup failed during project deletion', err),
+      );
+    }
 
     return this.transformProject(project);
   }

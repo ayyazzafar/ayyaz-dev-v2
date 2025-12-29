@@ -1,19 +1,20 @@
-import {
-  IsString,
-  IsOptional,
-  IsEnum,
-  IsBoolean,
-  IsInt,
-  IsUrl,
-  IsArray,
-  IsDateString,
-  MinLength,
-  Min,
-  Matches,
-  ValidateNested,
-  IsNumber,
-} from 'class-validator';
 import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Matches,
+  Min,
+  MinLength,
+  ValidateNested
+} from 'class-validator';
+
 
 /**
  * Enums matching Prisma schema
@@ -115,7 +116,6 @@ export class CreateProjectDto {
 
   /**
    * GitHub repository URL (optional)
-   * @example "https://github.com/ayyaz/spendnest"
    */
   @IsOptional()
   @IsUrl({}, { message: 'GitHub URL must be a valid URL' })

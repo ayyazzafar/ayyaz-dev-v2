@@ -31,6 +31,7 @@ export * from './loginDto';
 export * from './loginResponseDto';
 export * from './mediaControllerUploadFileBody';
 export * from './paginationMeta';
+export * from './presignedUrlRequestDto';
 export * from './projectDto';
 export * from './projectDtoStatus';
 export * from './projectDtoType';

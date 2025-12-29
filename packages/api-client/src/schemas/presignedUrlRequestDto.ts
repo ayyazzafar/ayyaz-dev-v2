@@ -16,7 +16,4 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * User role
- */
-export type UserResponseDtoRole = { [key: string]: unknown };
+export interface PresignedUrlRequestDto { [key: string]: unknown }

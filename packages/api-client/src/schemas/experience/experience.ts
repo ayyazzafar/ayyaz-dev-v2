@@ -25,18 +25,6 @@ import type {
 /**
  * @summary Create a new experience entry
  */
-export type experienceControllerCreateResponse201 = {
-  data: ExperienceDto
-  status: 201
-}
-    
-export type experienceControllerCreateResponseSuccess = (experienceControllerCreateResponse201) & {
-  headers: Headers;
-};
-;
-
-export type experienceControllerCreateResponse = (experienceControllerCreateResponseSuccess)
-
 export const getExperienceControllerCreateUrl = () => {
 
 
@@ -45,7 +33,7 @@ export const getExperienceControllerCreateUrl = () => {
   return `/api/experience`
 }
 
-export const experienceControllerCreate = async (createExperienceDto: CreateExperienceDto, options?: RequestInit): Promise<experienceControllerCreateResponse> => {
+export const experienceControllerCreate = async (createExperienceDto: CreateExperienceDto, options?: RequestInit): Promise<ExperienceDto> => {
   
   const res = await fetch(getExperienceControllerCreateUrl(),
   {      
@@ -59,26 +47,14 @@ export const experienceControllerCreate = async (createExperienceDto: CreateExpe
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: experienceControllerCreateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as experienceControllerCreateResponse
+  const data: ExperienceDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary List all work experience
  */
-export type experienceControllerFindAllResponse200 = {
-  data: ExperienceDto[]
-  status: 200
-}
-    
-export type experienceControllerFindAllResponseSuccess = (experienceControllerFindAllResponse200) & {
-  headers: Headers;
-};
-;
-
-export type experienceControllerFindAllResponse = (experienceControllerFindAllResponseSuccess)
-
 export const getExperienceControllerFindAllUrl = () => {
 
 
@@ -87,7 +63,7 @@ export const getExperienceControllerFindAllUrl = () => {
   return `/api/experience`
 }
 
-export const experienceControllerFindAll = async ( options?: RequestInit): Promise<experienceControllerFindAllResponse> => {
+export const experienceControllerFindAll = async ( options?: RequestInit): Promise<ExperienceDto[]> => {
   
   const res = await fetch(getExperienceControllerFindAllUrl(),
   {      
@@ -100,26 +76,14 @@ export const experienceControllerFindAll = async ( options?: RequestInit): Promi
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: experienceControllerFindAllResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as experienceControllerFindAllResponse
+  const data: ExperienceDto[] = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Get an experience entry by ID
  */
-export type experienceControllerFindOneResponse200 = {
-  data: ExperienceDto
-  status: 200
-}
-    
-export type experienceControllerFindOneResponseSuccess = (experienceControllerFindOneResponse200) & {
-  headers: Headers;
-};
-;
-
-export type experienceControllerFindOneResponse = (experienceControllerFindOneResponseSuccess)
-
 export const getExperienceControllerFindOneUrl = (id: string,) => {
 
 
@@ -128,7 +92,7 @@ export const getExperienceControllerFindOneUrl = (id: string,) => {
   return `/api/experience/${id}`
 }
 
-export const experienceControllerFindOne = async (id: string, options?: RequestInit): Promise<experienceControllerFindOneResponse> => {
+export const experienceControllerFindOne = async (id: string, options?: RequestInit): Promise<ExperienceDto> => {
   
   const res = await fetch(getExperienceControllerFindOneUrl(id),
   {      
@@ -141,26 +105,14 @@ export const experienceControllerFindOne = async (id: string, options?: RequestI
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: experienceControllerFindOneResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as experienceControllerFindOneResponse
+  const data: ExperienceDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Update an experience entry
  */
-export type experienceControllerUpdateResponse200 = {
-  data: ExperienceDto
-  status: 200
-}
-    
-export type experienceControllerUpdateResponseSuccess = (experienceControllerUpdateResponse200) & {
-  headers: Headers;
-};
-;
-
-export type experienceControllerUpdateResponse = (experienceControllerUpdateResponseSuccess)
-
 export const getExperienceControllerUpdateUrl = (id: string,) => {
 
 
@@ -170,7 +122,7 @@ export const getExperienceControllerUpdateUrl = (id: string,) => {
 }
 
 export const experienceControllerUpdate = async (id: string,
-    updateExperienceDto: UpdateExperienceDto, options?: RequestInit): Promise<experienceControllerUpdateResponse> => {
+    updateExperienceDto: UpdateExperienceDto, options?: RequestInit): Promise<ExperienceDto> => {
   
   const res = await fetch(getExperienceControllerUpdateUrl(id),
   {      
@@ -184,26 +136,14 @@ export const experienceControllerUpdate = async (id: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: experienceControllerUpdateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as experienceControllerUpdateResponse
+  const data: ExperienceDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Delete an experience entry
  */
-export type experienceControllerRemoveResponse200 = {
-  data: ExperienceDto
-  status: 200
-}
-    
-export type experienceControllerRemoveResponseSuccess = (experienceControllerRemoveResponse200) & {
-  headers: Headers;
-};
-;
-
-export type experienceControllerRemoveResponse = (experienceControllerRemoveResponseSuccess)
-
 export const getExperienceControllerRemoveUrl = (id: string,) => {
 
 
@@ -212,7 +152,7 @@ export const getExperienceControllerRemoveUrl = (id: string,) => {
   return `/api/experience/${id}`
 }
 
-export const experienceControllerRemove = async (id: string, options?: RequestInit): Promise<experienceControllerRemoveResponse> => {
+export const experienceControllerRemove = async (id: string, options?: RequestInit): Promise<ExperienceDto> => {
   
   const res = await fetch(getExperienceControllerRemoveUrl(id),
   {      
@@ -225,8 +165,8 @@ export const experienceControllerRemove = async (id: string, options?: RequestIn
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: experienceControllerRemoveResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as experienceControllerRemoveResponse
+  const data: ExperienceDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 

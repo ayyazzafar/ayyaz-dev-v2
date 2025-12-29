@@ -20,6 +20,17 @@ import * as zod from 'zod';
 export const appControllerGetHelloResponse = zod.string()
 
 
+export const fileUploadControllerGetPresignedUrlBody = zod.object({
+
+})
+
+
+export const fileUploadControllerDeleteFileParams = zod.object({
+  "key": zod.string(),
+  "path": zod.string()
+})
+
+
 /**
  * @summary POST /api/users - Create a new user
 
@@ -123,7 +134,9 @@ export const authControllerLoginResponse = zod.object({
   "id": zod.string().describe('User ID'),
   "email": zod.string().describe('User email'),
   "name": zod.string().nullable().describe('User name'),
-  "role": zod.enum(['ADMIN', 'VIEWER']).describe('User role')
+  "role": zod.object({
+
+}).describe('User role')
 }).describe('Authenticated user')
 })
 
@@ -135,7 +148,9 @@ export const authControllerGetMeResponse = zod.object({
   "id": zod.string().describe('User ID'),
   "email": zod.string().describe('User email'),
   "name": zod.string().nullable().describe('User name'),
-  "role": zod.enum(['ADMIN', 'VIEWER']).describe('User role')
+  "role": zod.object({
+
+}).describe('User role')
 })
 
 
@@ -162,7 +177,7 @@ export const projectsControllerCreateBody = zod.object({
   "status": zod.enum(['ACTIVE', 'COMPLETED', 'PAUSED', 'ARCHIVED']).describe('Project status'),
   "type": zod.enum(['PRODUCT', 'CLIENT', 'EXPERIMENT', 'LEARNING']).describe('Project type/category'),
   "url": zod.url().optional().describe('Live project URL (optional)'),
-  "github": zod.url().optional().describe('GitHub repository URL (optional)'),
+  "github": zod.string().optional().describe('GitHub repository URL (optional)aaa'),
   "featured": zod.boolean().optional().describe('Featured on homepage?'),
   "order": zod.number().min(projectsControllerCreateBodyOrderMin).optional().describe('Display order (lower = first)'),
   "startedAt": zod.string().optional().describe('When project was started'),
@@ -335,7 +350,7 @@ export const projectsControllerUpdateBody = zod.object({
   "status": zod.enum(['ACTIVE', 'COMPLETED', 'PAUSED', 'ARCHIVED']).optional().describe('Project status'),
   "type": zod.enum(['PRODUCT', 'CLIENT', 'EXPERIMENT', 'LEARNING']).optional().describe('Project type/category'),
   "url": zod.url().optional().describe('Live project URL (optional)'),
-  "github": zod.url().optional().describe('GitHub repository URL (optional)'),
+  "github": zod.string().optional().describe('GitHub repository URL (optional)aaa'),
   "featured": zod.boolean().optional().describe('Featured on homepage?'),
   "order": zod.number().min(projectsControllerUpdateBodyOrderMin).optional().describe('Display order (lower = first)'),
   "startedAt": zod.string().optional().describe('When project was started'),

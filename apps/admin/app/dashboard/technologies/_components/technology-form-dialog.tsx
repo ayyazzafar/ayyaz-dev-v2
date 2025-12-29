@@ -1,8 +1,8 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { technologiesControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { TechnologyDto } from "@/lib/api/schemas";
-import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
+import { technologiesControllerCreateBody } from "@ayyaz-dev/api-client";
 
 type TechnologyFormValues = z.infer<typeof technologiesControllerCreateBody>;
 
@@ -47,15 +46,22 @@ export function TechnologyFormDialog({
 }: TechnologyFormDialogProps) {
   const isEditing = !!technology;
 
+  function getDefaultValues() {
+    return {
+      name: technology?.name || "",
+      icon: technology?.icon || "",
+    };
+  }
+
   const form = useForm<TechnologyFormValues>({
     resolver: zodResolver(technologiesControllerCreateBody),
-    defaultValues: getZodDefaults(technologiesControllerCreateBody),
+    defaultValues: getDefaultValues(),
   });
 
   // Reset form when dialog opens with technology data
   useEffect(() => {
     if (open) {
-      form.reset(mapEntityToFormValues(technologiesControllerCreateBody, technology));
+      form.reset(getDefaultValues());
     }
   }, [open, technology, form]);
 

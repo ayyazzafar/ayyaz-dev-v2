@@ -25,18 +25,6 @@ import type {
 /**
  * @summary Login with email and password
  */
-export type authControllerLoginResponse200 = {
-  data: LoginResponseDto
-  status: 200
-}
-    
-export type authControllerLoginResponseSuccess = (authControllerLoginResponse200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerLoginResponse = (authControllerLoginResponseSuccess)
-
 export const getAuthControllerLoginUrl = () => {
 
 
@@ -45,7 +33,7 @@ export const getAuthControllerLoginUrl = () => {
   return `/api/auth/login`
 }
 
-export const authControllerLogin = async (loginDto: LoginDto, options?: RequestInit): Promise<authControllerLoginResponse> => {
+export const authControllerLogin = async (loginDto: LoginDto, options?: RequestInit): Promise<LoginResponseDto> => {
   
   const res = await fetch(getAuthControllerLoginUrl(),
   {      
@@ -59,26 +47,14 @@ export const authControllerLogin = async (loginDto: LoginDto, options?: RequestI
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: authControllerLoginResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as authControllerLoginResponse
+  const data: LoginResponseDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Get current authenticated user profile
  */
-export type authControllerGetMeResponse200 = {
-  data: UserResponseDto
-  status: 200
-}
-    
-export type authControllerGetMeResponseSuccess = (authControllerGetMeResponse200) & {
-  headers: Headers;
-};
-;
-
-export type authControllerGetMeResponse = (authControllerGetMeResponseSuccess)
-
 export const getAuthControllerGetMeUrl = () => {
 
 
@@ -87,7 +63,7 @@ export const getAuthControllerGetMeUrl = () => {
   return `/api/auth/me`
 }
 
-export const authControllerGetMe = async ( options?: RequestInit): Promise<authControllerGetMeResponse> => {
+export const authControllerGetMe = async ( options?: RequestInit): Promise<UserResponseDto> => {
   
   const res = await fetch(getAuthControllerGetMeUrl(),
   {      
@@ -100,8 +76,8 @@ export const authControllerGetMe = async ( options?: RequestInit): Promise<authC
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: authControllerGetMeResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as authControllerGetMeResponse
+  const data: UserResponseDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 

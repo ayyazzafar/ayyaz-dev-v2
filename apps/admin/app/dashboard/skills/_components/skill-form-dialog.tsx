@@ -1,8 +1,8 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -33,9 +33,8 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 
-import { skillsControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { SkillDto } from "@/lib/api/schemas";
-import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
+import { skillsControllerCreateBody } from "@ayyaz-dev/api-client";
 
 // Use input type for form (matches zodResolver expectations)
 type SkillFormValues = z.input<typeof skillsControllerCreateBody>;
@@ -66,15 +65,31 @@ export function SkillFormDialog({
 }: SkillFormDialogProps) {
   const isEditing = !!skill;
 
+  function getDefaultValues() {
+    return {
+      name: skill?.name || "",
+      category: skill?.category as any || "FRONTEND",
+      level: skill?.level || 80,
+      order: skill?.order || 0,
+    };
+  }
+
   const form = useForm<SkillFormValues>({
     resolver: zodResolver(skillsControllerCreateBody),
-    defaultValues: getZodDefaults(skillsControllerCreateBody),
+    defaultValues: getDefaultValues(),
   });
 
   // Reset form when dialog opens with skill data
   useEffect(() => {
     if (open) {
-      form.reset(mapEntityToFormValues(skillsControllerCreateBody, skill));
+      form.reset(getDefaultValues());
+    }
+  }, [open, form]);
+
+  // Reset form when dialog opens with skill data
+  useEffect(() => {
+    if (open) {
+      form.reset(getDefaultValues());
     }
   }, [open, skill, form]);
 

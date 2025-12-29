@@ -16,18 +16,6 @@
  * OpenAPI spec version: 1.0
  */
 
-export type appControllerGetHelloResponse200 = {
-  data: string
-  status: 200
-}
-    
-export type appControllerGetHelloResponseSuccess = (appControllerGetHelloResponse200) & {
-  headers: Headers;
-};
-;
-
-export type appControllerGetHelloResponse = (appControllerGetHelloResponseSuccess)
-
 export const getAppControllerGetHelloUrl = () => {
 
 
@@ -36,7 +24,7 @@ export const getAppControllerGetHelloUrl = () => {
   return `/api`
 }
 
-export const appControllerGetHello = async ( options?: RequestInit): Promise<appControllerGetHelloResponse> => {
+export const appControllerGetHello = async ( options?: RequestInit): Promise<string> => {
   
   const res = await fetch(getAppControllerGetHelloUrl(),
   {      
@@ -49,8 +37,8 @@ export const appControllerGetHello = async ( options?: RequestInit): Promise<app
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: appControllerGetHelloResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as appControllerGetHelloResponse
+  const data: string = body ? JSON.parse(body) : {}
+  return data
 }
 
 

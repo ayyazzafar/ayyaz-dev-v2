@@ -1,8 +1,8 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -24,12 +24,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
-import { experienceControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { ExperienceDto } from "@/lib/api/schemas";
-import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
+import { experienceControllerCreateBody } from "@ayyaz-dev/api-client";
 
 // Use input type for form (matches zodResolver expectations)
 type ExperienceFormValues = z.input<typeof experienceControllerCreateBody>;
@@ -51,17 +50,29 @@ export function ExperienceFormDialog({
 }: ExperienceFormDialogProps) {
   const isEditing = !!experience;
 
+  function getDefaultValues() {
+    return {
+      company: experience?.company || "",
+      role: experience?.role || "",
+      description: experience?.description || "",
+      startDate: experience?.startDate || "",
+      endDate: experience?.endDate || "",
+      current: experience?.current || false,
+      order: 0,
+    }
+  }
+
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceControllerCreateBody),
-    defaultValues: getZodDefaults(experienceControllerCreateBody),
+    defaultValues: getDefaultValues(),
   });
 
   // Reset form when dialog opens with experience data
   useEffect(() => {
     if (open) {
-      form.reset(mapEntityToFormValues(experienceControllerCreateBody, experience));
+      form.reset(getDefaultValues());
     }
-  }, [open, experience, form]);
+  }, [open, form]);
 
   // Watch current field to conditionally disable endDate
   const isCurrent = form.watch("current");

@@ -23,18 +23,6 @@ import type {
 /**
  * @summary Upload an image file
  */
-export type mediaControllerUploadFileResponse201 = {
-  data: void
-  status: 201
-}
-    
-export type mediaControllerUploadFileResponseSuccess = (mediaControllerUploadFileResponse201) & {
-  headers: Headers;
-};
-;
-
-export type mediaControllerUploadFileResponse = (mediaControllerUploadFileResponseSuccess)
-
 export const getMediaControllerUploadFileUrl = () => {
 
 
@@ -43,7 +31,7 @@ export const getMediaControllerUploadFileUrl = () => {
   return `/api/media/upload`
 }
 
-export const mediaControllerUploadFile = async (mediaControllerUploadFileBody: MediaControllerUploadFileBody, options?: RequestInit): Promise<mediaControllerUploadFileResponse> => {
+export const mediaControllerUploadFile = async (mediaControllerUploadFileBody: MediaControllerUploadFileBody, options?: RequestInit): Promise<void> => {
     const formData = new FormData();
 if(mediaControllerUploadFileBody.file !== undefined) {
  formData.append(`file`, mediaControllerUploadFileBody.file)
@@ -61,26 +49,14 @@ if(mediaControllerUploadFileBody.file !== undefined) {
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: mediaControllerUploadFileResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as mediaControllerUploadFileResponse
+  const data: void = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Delete an uploaded file
  */
-export type mediaControllerDeleteFileResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type mediaControllerDeleteFileResponseSuccess = (mediaControllerDeleteFileResponse200) & {
-  headers: Headers;
-};
-;
-
-export type mediaControllerDeleteFileResponse = (mediaControllerDeleteFileResponseSuccess)
-
 export const getMediaControllerDeleteFileUrl = (key: string,) => {
 
 
@@ -89,7 +65,7 @@ export const getMediaControllerDeleteFileUrl = (key: string,) => {
   return `/api/media/${key}`
 }
 
-export const mediaControllerDeleteFile = async (key: string, options?: RequestInit): Promise<mediaControllerDeleteFileResponse> => {
+export const mediaControllerDeleteFile = async (key: string, options?: RequestInit): Promise<void> => {
   
   const res = await fetch(getMediaControllerDeleteFileUrl(key),
   {      
@@ -102,8 +78,8 @@ export const mediaControllerDeleteFile = async (key: string, options?: RequestIn
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: mediaControllerDeleteFileResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as mediaControllerDeleteFileResponse
+  const data: void = body ? JSON.parse(body) : {}
+  return data
 }
 
 

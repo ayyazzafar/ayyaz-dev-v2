@@ -1,18 +1,22 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import type { UploadedFile } from "@ayyaz-dev/file-upload";
+import { FileUploader, useFileUpload } from "@ayyaz-dev/file-upload/client";
+
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -24,7 +28,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -32,13 +35,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
-import { projectsControllerCreateBody } from "@ayyaz-dev/api-client";
 import type { ProjectDto } from "@/lib/api/schemas";
-import { getZodDefaults, mapEntityToFormValues } from "@/lib/utils/zod-defaults";
+import { projectsControllerCreateBody } from "@ayyaz-dev/api-client";
 
 type ProjectFormValues = z.infer<typeof projectsControllerCreateBody>;
 
@@ -73,17 +75,68 @@ export function ProjectFormDialog({
 }: ProjectFormDialogProps) {
   const isEditing = !!project;
 
+  function getDefaultValues() {
+    return {
+      slug: project?.slug || "",
+      title: project?.title || "",
+      description: project?.description || "",
+      longDescription: project?.longDescription || "",
+      status: project?.status || "ACTIVE",
+      type: project?.type || "PRODUCT",
+      url: project?.url || undefined,
+      github: project?.github || undefined,
+      featured: project?.featured || false,
+      order: project?.order || 0,
+      startedAt: project?.startedAt || undefined,
+      completedAt: project?.completedAt || undefined,
+      technologyIds: project?.technologies?.map((tech) => tech.id) || [],
+      images: project?.images || [],
+    };
+  }
+
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectsControllerCreateBody),
-    defaultValues: getZodDefaults(projectsControllerCreateBody),
+    defaultValues: getDefaultValues(),
   });
 
   // Reset form when dialog opens with project data
   useEffect(() => {
     if (open) {
-      form.reset(mapEntityToFormValues(projectsControllerCreateBody, project));
+      form.reset(getDefaultValues());
     }
-  }, [open, project, form]);
+  }, [open, form]);
+
+
+  // File upload hook
+  const {
+    files: uploadFiles,
+    upload,
+    remove,
+    clear: clearUploads,
+    isUploading,
+    uploadedFiles,
+  } = useFileUpload({
+    presignedUrlEndpoint: `${process.env.NEXT_PUBLIC_API_URL}/api/upload/presigned-url`,
+    folder: 'projects', // Upload to projects/ folder in R2
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+    maxFileSize: 5 * 1024 * 1024, // 5MB
+    onUploadComplete: (file: UploadedFile) => {
+      // Add uploaded image to form
+      const currentImages = form.getValues('images') || [];
+      form.setValue('images', [
+        ...currentImages,
+        { url: file.url, alt: file.filename, order: currentImages.length },
+      ]);
+    },
+  });
+
+  // Reset form and uploads when dialog opens with project data
+  useEffect(() => {
+    if (open) {
+      clearUploads();
+      form.reset(getDefaultValues());
+    }
+  }, [open, project, form, clearUploads]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -385,6 +438,69 @@ export function ProjectFormDialog({
               </div>
             </div>
 
+            <Separator />
+
+            {/* Project Images */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground">Project Images</h3>
+              <FormField
+                control={form.control}
+                name="images"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="space-y-4">
+                        {/* Show existing images from project (when editing) */}
+                        {field.value && field.value.length > 0 && (
+                          <div className="grid grid-cols-4 gap-2">
+                            {field.value.map((img, index) => (
+                              <div key={index} className="relative group aspect-video rounded-md overflow-hidden border bg-muted">
+                                <img
+                                  src={img.url}
+                                  alt={img.alt || `Image ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newImages = field.value?.filter((_, i) => i !== index) || [];
+                                    field.onChange(newImages.map((img, i) => ({ ...img, order: i })));
+                                  }}
+                                  className="absolute top-1 right-1 p-1 rounded-md bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                                  aria-label="Remove image"
+                                >
+                                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* File uploader for new images */}
+                        <FileUploader
+                          files={uploadFiles}
+                          onUpload={upload}
+                          onRemove={remove}
+                          isUploading={isUploading}
+                          multiple
+                          maxFiles={10}
+                          placeholder="Click to upload project images"
+                          helperText="JPG, PNG, WebP or GIF up to 5MB each"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Add screenshots, mockups, or other images for this project
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <DialogFooter className="pt-4">
               <Button
                 type="button"
@@ -393,8 +509,8 @@ export function ProjectFormDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Saving..." : isEditing ? "Update" : "Create"}
+              <Button type="submit" disabled={isPending || isUploading}>
+                {isUploading ? "Uploading..." : isPending ? "Saving..." : isEditing ? "Update" : "Create"}
               </Button>
             </DialogFooter>
           </form>

@@ -27,18 +27,6 @@ import type {
 /**
  * @summary Create a new technology
  */
-export type technologiesControllerCreateResponse201 = {
-  data: TechnologyDto
-  status: 201
-}
-    
-export type technologiesControllerCreateResponseSuccess = (technologiesControllerCreateResponse201) & {
-  headers: Headers;
-};
-;
-
-export type technologiesControllerCreateResponse = (technologiesControllerCreateResponseSuccess)
-
 export const getTechnologiesControllerCreateUrl = () => {
 
 
@@ -47,7 +35,7 @@ export const getTechnologiesControllerCreateUrl = () => {
   return `/api/technologies`
 }
 
-export const technologiesControllerCreate = async (createTechnologyDto: CreateTechnologyDto, options?: RequestInit): Promise<technologiesControllerCreateResponse> => {
+export const technologiesControllerCreate = async (createTechnologyDto: CreateTechnologyDto, options?: RequestInit): Promise<TechnologyDto> => {
   
   const res = await fetch(getTechnologiesControllerCreateUrl(),
   {      
@@ -61,26 +49,14 @@ export const technologiesControllerCreate = async (createTechnologyDto: CreateTe
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: technologiesControllerCreateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as technologiesControllerCreateResponse
+  const data: TechnologyDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary List all technologies
  */
-export type technologiesControllerFindAllResponse200 = {
-  data: TechnologyListResponseDto
-  status: 200
-}
-    
-export type technologiesControllerFindAllResponseSuccess = (technologiesControllerFindAllResponse200) & {
-  headers: Headers;
-};
-;
-
-export type technologiesControllerFindAllResponse = (technologiesControllerFindAllResponseSuccess)
-
 export const getTechnologiesControllerFindAllUrl = (params: TechnologiesControllerFindAllParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -96,7 +72,7 @@ export const getTechnologiesControllerFindAllUrl = (params: TechnologiesControll
   return stringifiedParams.length > 0 ? `/api/technologies?${stringifiedParams}` : `/api/technologies`
 }
 
-export const technologiesControllerFindAll = async (params: TechnologiesControllerFindAllParams, options?: RequestInit): Promise<technologiesControllerFindAllResponse> => {
+export const technologiesControllerFindAll = async (params: TechnologiesControllerFindAllParams, options?: RequestInit): Promise<TechnologyListResponseDto> => {
   
   const res = await fetch(getTechnologiesControllerFindAllUrl(params),
   {      
@@ -109,26 +85,14 @@ export const technologiesControllerFindAll = async (params: TechnologiesControll
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: technologiesControllerFindAllResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as technologiesControllerFindAllResponse
+  const data: TechnologyListResponseDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Get a technology by ID
  */
-export type technologiesControllerFindOneResponse200 = {
-  data: TechnologyDto
-  status: 200
-}
-    
-export type technologiesControllerFindOneResponseSuccess = (technologiesControllerFindOneResponse200) & {
-  headers: Headers;
-};
-;
-
-export type technologiesControllerFindOneResponse = (technologiesControllerFindOneResponseSuccess)
-
 export const getTechnologiesControllerFindOneUrl = (id: string,) => {
 
 
@@ -137,7 +101,7 @@ export const getTechnologiesControllerFindOneUrl = (id: string,) => {
   return `/api/technologies/${id}`
 }
 
-export const technologiesControllerFindOne = async (id: string, options?: RequestInit): Promise<technologiesControllerFindOneResponse> => {
+export const technologiesControllerFindOne = async (id: string, options?: RequestInit): Promise<TechnologyDto> => {
   
   const res = await fetch(getTechnologiesControllerFindOneUrl(id),
   {      
@@ -150,26 +114,14 @@ export const technologiesControllerFindOne = async (id: string, options?: Reques
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: technologiesControllerFindOneResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as technologiesControllerFindOneResponse
+  const data: TechnologyDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Update a technology
  */
-export type technologiesControllerUpdateResponse200 = {
-  data: TechnologyDto
-  status: 200
-}
-    
-export type technologiesControllerUpdateResponseSuccess = (technologiesControllerUpdateResponse200) & {
-  headers: Headers;
-};
-;
-
-export type technologiesControllerUpdateResponse = (technologiesControllerUpdateResponseSuccess)
-
 export const getTechnologiesControllerUpdateUrl = (id: string,) => {
 
 
@@ -179,7 +131,7 @@ export const getTechnologiesControllerUpdateUrl = (id: string,) => {
 }
 
 export const technologiesControllerUpdate = async (id: string,
-    updateTechnologyDto: UpdateTechnologyDto, options?: RequestInit): Promise<technologiesControllerUpdateResponse> => {
+    updateTechnologyDto: UpdateTechnologyDto, options?: RequestInit): Promise<TechnologyDto> => {
   
   const res = await fetch(getTechnologiesControllerUpdateUrl(id),
   {      
@@ -193,26 +145,14 @@ export const technologiesControllerUpdate = async (id: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: technologiesControllerUpdateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as technologiesControllerUpdateResponse
+  const data: TechnologyDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Delete a technology
  */
-export type technologiesControllerRemoveResponse200 = {
-  data: TechnologyDto
-  status: 200
-}
-    
-export type technologiesControllerRemoveResponseSuccess = (technologiesControllerRemoveResponse200) & {
-  headers: Headers;
-};
-;
-
-export type technologiesControllerRemoveResponse = (technologiesControllerRemoveResponseSuccess)
-
 export const getTechnologiesControllerRemoveUrl = (id: string,) => {
 
 
@@ -221,7 +161,7 @@ export const getTechnologiesControllerRemoveUrl = (id: string,) => {
   return `/api/technologies/${id}`
 }
 
-export const technologiesControllerRemove = async (id: string, options?: RequestInit): Promise<technologiesControllerRemoveResponse> => {
+export const technologiesControllerRemove = async (id: string, options?: RequestInit): Promise<TechnologyDto> => {
   
   const res = await fetch(getTechnologiesControllerRemoveUrl(id),
   {      
@@ -234,8 +174,8 @@ export const technologiesControllerRemove = async (id: string, options?: Request
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: technologiesControllerRemoveResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as technologiesControllerRemoveResponse
+  const data: TechnologyDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 

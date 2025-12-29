@@ -32,18 +32,6 @@ import type {
 Request body is automatically validated against CreateUserDto
 If validation fails, NestJS returns 400 Bad Request
  */
-export type usersControllerCreateResponse201 = {
-  data: UsersControllerCreate201
-  status: 201
-}
-    
-export type usersControllerCreateResponseSuccess = (usersControllerCreateResponse201) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerCreateResponse = (usersControllerCreateResponseSuccess)
-
 export const getUsersControllerCreateUrl = () => {
 
 
@@ -52,7 +40,7 @@ export const getUsersControllerCreateUrl = () => {
   return `/api/users`
 }
 
-export const usersControllerCreate = async (createUserDto: CreateUserDto, options?: RequestInit): Promise<usersControllerCreateResponse> => {
+export const usersControllerCreate = async (createUserDto: CreateUserDto, options?: RequestInit): Promise<UsersControllerCreate201> => {
   
   const res = await fetch(getUsersControllerCreateUrl(),
   {      
@@ -66,8 +54,8 @@ export const usersControllerCreate = async (createUserDto: CreateUserDto, option
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: usersControllerCreateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as usersControllerCreateResponse
+  const data: UsersControllerCreate201 = body ? JSON.parse(body) : {}
+  return data
 }
 
 
@@ -76,18 +64,6 @@ export const usersControllerCreate = async (createUserDto: CreateUserDto, option
 
 Returns array of users (without passwords)
  */
-export type usersControllerFindAllResponse200 = {
-  data: UsersControllerFindAll200Item[]
-  status: 200
-}
-    
-export type usersControllerFindAllResponseSuccess = (usersControllerFindAllResponse200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerFindAllResponse = (usersControllerFindAllResponseSuccess)
-
 export const getUsersControllerFindAllUrl = () => {
 
 
@@ -96,7 +72,7 @@ export const getUsersControllerFindAllUrl = () => {
   return `/api/users`
 }
 
-export const usersControllerFindAll = async ( options?: RequestInit): Promise<usersControllerFindAllResponse> => {
+export const usersControllerFindAll = async ( options?: RequestInit): Promise<UsersControllerFindAll200Item[]> => {
   
   const res = await fetch(getUsersControllerFindAllUrl(),
   {      
@@ -109,8 +85,8 @@ export const usersControllerFindAll = async ( options?: RequestInit): Promise<us
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: usersControllerFindAllResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as usersControllerFindAllResponse
+  const data: UsersControllerFindAll200Item[] = body ? JSON.parse(body) : {}
+  return data
 }
 
 
@@ -119,18 +95,6 @@ export const usersControllerFindAll = async ( options?: RequestInit): Promise<us
 
 @Param('id') extracts the :id from the URL
  */
-export type usersControllerFindOneResponse200 = {
-  data: UsersControllerFindOne200
-  status: 200
-}
-    
-export type usersControllerFindOneResponseSuccess = (usersControllerFindOneResponse200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerFindOneResponse = (usersControllerFindOneResponseSuccess)
-
 export const getUsersControllerFindOneUrl = (id: string,) => {
 
 
@@ -139,7 +103,7 @@ export const getUsersControllerFindOneUrl = (id: string,) => {
   return `/api/users/${id}`
 }
 
-export const usersControllerFindOne = async (id: string, options?: RequestInit): Promise<usersControllerFindOneResponse> => {
+export const usersControllerFindOne = async (id: string, options?: RequestInit): Promise<UsersControllerFindOne200> => {
   
   const res = await fetch(getUsersControllerFindOneUrl(id),
   {      
@@ -152,8 +116,8 @@ export const usersControllerFindOne = async (id: string, options?: RequestInit):
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: usersControllerFindOneResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as usersControllerFindOneResponse
+  const data: UsersControllerFindOne200 = body ? JSON.parse(body) : {}
+  return data
 }
 
 
@@ -165,18 +129,6 @@ PUT = full replacement (must send all fields)
 
 We use PATCH because it's more practical for updates
  */
-export type usersControllerUpdateResponse200 = {
-  data: UsersControllerUpdate200
-  status: 200
-}
-    
-export type usersControllerUpdateResponseSuccess = (usersControllerUpdateResponse200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerUpdateResponse = (usersControllerUpdateResponseSuccess)
-
 export const getUsersControllerUpdateUrl = (id: string,) => {
 
 
@@ -186,7 +138,7 @@ export const getUsersControllerUpdateUrl = (id: string,) => {
 }
 
 export const usersControllerUpdate = async (id: string,
-    updateUserDto: UpdateUserDto, options?: RequestInit): Promise<usersControllerUpdateResponse> => {
+    updateUserDto: UpdateUserDto, options?: RequestInit): Promise<UsersControllerUpdate200> => {
   
   const res = await fetch(getUsersControllerUpdateUrl(id),
   {      
@@ -200,8 +152,8 @@ export const usersControllerUpdate = async (id: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: usersControllerUpdateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as usersControllerUpdateResponse
+  const data: UsersControllerUpdate200 = body ? JSON.parse(body) : {}
+  return data
 }
 
 
@@ -210,18 +162,6 @@ export const usersControllerUpdate = async (id: string,
 
 Returns the deleted user data
  */
-export type usersControllerRemoveResponse200 = {
-  data: UsersControllerRemove200
-  status: 200
-}
-    
-export type usersControllerRemoveResponseSuccess = (usersControllerRemoveResponse200) & {
-  headers: Headers;
-};
-;
-
-export type usersControllerRemoveResponse = (usersControllerRemoveResponseSuccess)
-
 export const getUsersControllerRemoveUrl = (id: string,) => {
 
 
@@ -230,7 +170,7 @@ export const getUsersControllerRemoveUrl = (id: string,) => {
   return `/api/users/${id}`
 }
 
-export const usersControllerRemove = async (id: string, options?: RequestInit): Promise<usersControllerRemoveResponse> => {
+export const usersControllerRemove = async (id: string, options?: RequestInit): Promise<UsersControllerRemove200> => {
   
   const res = await fetch(getUsersControllerRemoveUrl(id),
   {      
@@ -243,8 +183,8 @@ export const usersControllerRemove = async (id: string, options?: RequestInit): 
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: usersControllerRemoveResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as usersControllerRemoveResponse
+  const data: UsersControllerRemove200 = body ? JSON.parse(body) : {}
+  return data
 }
 
 

@@ -27,18 +27,6 @@ import type {
 /**
  * @summary Create a new skill
  */
-export type skillsControllerCreateResponse201 = {
-  data: SkillDto
-  status: 201
-}
-    
-export type skillsControllerCreateResponseSuccess = (skillsControllerCreateResponse201) & {
-  headers: Headers;
-};
-;
-
-export type skillsControllerCreateResponse = (skillsControllerCreateResponseSuccess)
-
 export const getSkillsControllerCreateUrl = () => {
 
 
@@ -47,7 +35,7 @@ export const getSkillsControllerCreateUrl = () => {
   return `/api/skills`
 }
 
-export const skillsControllerCreate = async (createSkillDto: CreateSkillDto, options?: RequestInit): Promise<skillsControllerCreateResponse> => {
+export const skillsControllerCreate = async (createSkillDto: CreateSkillDto, options?: RequestInit): Promise<SkillDto> => {
   
   const res = await fetch(getSkillsControllerCreateUrl(),
   {      
@@ -61,26 +49,14 @@ export const skillsControllerCreate = async (createSkillDto: CreateSkillDto, opt
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: skillsControllerCreateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as skillsControllerCreateResponse
+  const data: SkillDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary List all skills
  */
-export type skillsControllerFindAllResponse200 = {
-  data: SkillDto[]
-  status: 200
-}
-    
-export type skillsControllerFindAllResponseSuccess = (skillsControllerFindAllResponse200) & {
-  headers: Headers;
-};
-;
-
-export type skillsControllerFindAllResponse = (skillsControllerFindAllResponseSuccess)
-
 export const getSkillsControllerFindAllUrl = (params?: SkillsControllerFindAllParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -96,7 +72,7 @@ export const getSkillsControllerFindAllUrl = (params?: SkillsControllerFindAllPa
   return stringifiedParams.length > 0 ? `/api/skills?${stringifiedParams}` : `/api/skills`
 }
 
-export const skillsControllerFindAll = async (params?: SkillsControllerFindAllParams, options?: RequestInit): Promise<skillsControllerFindAllResponse> => {
+export const skillsControllerFindAll = async (params?: SkillsControllerFindAllParams, options?: RequestInit): Promise<SkillDto[]> => {
   
   const res = await fetch(getSkillsControllerFindAllUrl(params),
   {      
@@ -109,26 +85,14 @@ export const skillsControllerFindAll = async (params?: SkillsControllerFindAllPa
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: skillsControllerFindAllResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as skillsControllerFindAllResponse
+  const data: SkillDto[] = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Get skills grouped by category
  */
-export type skillsControllerFindGroupedResponse200 = {
-  data: SkillsControllerFindGrouped200
-  status: 200
-}
-    
-export type skillsControllerFindGroupedResponseSuccess = (skillsControllerFindGroupedResponse200) & {
-  headers: Headers;
-};
-;
-
-export type skillsControllerFindGroupedResponse = (skillsControllerFindGroupedResponseSuccess)
-
 export const getSkillsControllerFindGroupedUrl = () => {
 
 
@@ -137,7 +101,7 @@ export const getSkillsControllerFindGroupedUrl = () => {
   return `/api/skills/grouped`
 }
 
-export const skillsControllerFindGrouped = async ( options?: RequestInit): Promise<skillsControllerFindGroupedResponse> => {
+export const skillsControllerFindGrouped = async ( options?: RequestInit): Promise<SkillsControllerFindGrouped200> => {
   
   const res = await fetch(getSkillsControllerFindGroupedUrl(),
   {      
@@ -150,26 +114,14 @@ export const skillsControllerFindGrouped = async ( options?: RequestInit): Promi
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: skillsControllerFindGroupedResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as skillsControllerFindGroupedResponse
+  const data: SkillsControllerFindGrouped200 = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Get a skill by ID
  */
-export type skillsControllerFindOneResponse200 = {
-  data: SkillDto
-  status: 200
-}
-    
-export type skillsControllerFindOneResponseSuccess = (skillsControllerFindOneResponse200) & {
-  headers: Headers;
-};
-;
-
-export type skillsControllerFindOneResponse = (skillsControllerFindOneResponseSuccess)
-
 export const getSkillsControllerFindOneUrl = (id: string,) => {
 
 
@@ -178,7 +130,7 @@ export const getSkillsControllerFindOneUrl = (id: string,) => {
   return `/api/skills/${id}`
 }
 
-export const skillsControllerFindOne = async (id: string, options?: RequestInit): Promise<skillsControllerFindOneResponse> => {
+export const skillsControllerFindOne = async (id: string, options?: RequestInit): Promise<SkillDto> => {
   
   const res = await fetch(getSkillsControllerFindOneUrl(id),
   {      
@@ -191,26 +143,14 @@ export const skillsControllerFindOne = async (id: string, options?: RequestInit)
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: skillsControllerFindOneResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as skillsControllerFindOneResponse
+  const data: SkillDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Update a skill
  */
-export type skillsControllerUpdateResponse200 = {
-  data: SkillDto
-  status: 200
-}
-    
-export type skillsControllerUpdateResponseSuccess = (skillsControllerUpdateResponse200) & {
-  headers: Headers;
-};
-;
-
-export type skillsControllerUpdateResponse = (skillsControllerUpdateResponseSuccess)
-
 export const getSkillsControllerUpdateUrl = (id: string,) => {
 
 
@@ -220,7 +160,7 @@ export const getSkillsControllerUpdateUrl = (id: string,) => {
 }
 
 export const skillsControllerUpdate = async (id: string,
-    updateSkillDto: UpdateSkillDto, options?: RequestInit): Promise<skillsControllerUpdateResponse> => {
+    updateSkillDto: UpdateSkillDto, options?: RequestInit): Promise<SkillDto> => {
   
   const res = await fetch(getSkillsControllerUpdateUrl(id),
   {      
@@ -234,26 +174,14 @@ export const skillsControllerUpdate = async (id: string,
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: skillsControllerUpdateResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as skillsControllerUpdateResponse
+  const data: SkillDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 
 /**
  * @summary Delete a skill
  */
-export type skillsControllerRemoveResponse200 = {
-  data: SkillDto
-  status: 200
-}
-    
-export type skillsControllerRemoveResponseSuccess = (skillsControllerRemoveResponse200) & {
-  headers: Headers;
-};
-;
-
-export type skillsControllerRemoveResponse = (skillsControllerRemoveResponseSuccess)
-
 export const getSkillsControllerRemoveUrl = (id: string,) => {
 
 
@@ -262,7 +190,7 @@ export const getSkillsControllerRemoveUrl = (id: string,) => {
   return `/api/skills/${id}`
 }
 
-export const skillsControllerRemove = async (id: string, options?: RequestInit): Promise<skillsControllerRemoveResponse> => {
+export const skillsControllerRemove = async (id: string, options?: RequestInit): Promise<SkillDto> => {
   
   const res = await fetch(getSkillsControllerRemoveUrl(id),
   {      
@@ -275,8 +203,8 @@ export const skillsControllerRemove = async (id: string, options?: RequestInit):
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: skillsControllerRemoveResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as skillsControllerRemoveResponse
+  const data: SkillDto = body ? JSON.parse(body) : {}
+  return data
 }
 
 

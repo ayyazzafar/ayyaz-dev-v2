@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './modules/prisma/prisma.module';
@@ -10,6 +10,7 @@ import { TechnologiesModule } from './modules/technologies/technologies.module';
 import { SkillsModule } from './modules/skills/skills.module';
 import { ExperienceModule } from './modules/experience/experience.module';
 import { MediaModule } from './modules/media/media.module';
+import { FileUploadModule } from '@ayyaz-dev/file-upload/server';
 
 /**
  * AppModule - The root module of the application
@@ -33,6 +34,22 @@ import { MediaModule } from './modules/media/media.module';
     // Database - @Global makes PrismaService available everywhere
     PrismaModule,
 
+    // File uploads with presigned URLs (Cloudflare R2)
+    // Provides: POST /upload/presigned-url, DELETE /upload/:key, GET /upload/config
+    // isGlobal: true - FileUploadService available everywhere (for cleanup in services)
+    FileUploadModule.forRootAsync({
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => ({
+        provider: 'r2' as const,
+        bucket: configService.getOrThrow<string>('R2_BUCKET_NAME'),
+        publicUrl: configService.getOrThrow<string>('R2_PUBLIC_URL'),
+        accountIdOrRegion: configService.getOrThrow<string>('R2_ACCOUNT_ID'),
+        accessKeyId: configService.getOrThrow<string>('R2_ACCESS_KEY_ID'),
+        secretAccessKey: configService.getOrThrow<string>('R2_SECRET_ACCESS_KEY'),
+      }),
+      inject: [ConfigService],
+    }),
+
     // Feature modules
     UsersModule,
     AuthModule,
@@ -45,4 +62,4 @@ import { MediaModule } from './modules/media/media.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

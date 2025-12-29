@@ -39,3 +39,10 @@ yarn-error.log*
 
 
 admin-backup
+
+# Terraform
+infrastructure/.terraform/
+infrastructure/*.tfstate
+infrastructure/*.tfstate.*
+infrastructure/.terraform.lock.hcl
+infrastructure/terraform.tfvars.secret

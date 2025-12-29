@@ -4,9 +4,9 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev-api/api:$COMMIT_SHA'
       - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:latest'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev-api/api:latest'
       - '-f'
       - 'apps/api/Dockerfile'
       - '.'
@@ -15,12 +15,12 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev-api/api:$COMMIT_SHA'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:latest'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev-api/api:latest'
 
   # Deploy to Cloud Run (env vars are set via gcloud run services update separately)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -29,7 +29,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'ayyaz-dev-api'
-      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev-api/api:$COMMIT_SHA'
       - '--region=us-central1'
       - '--platform=managed'
       - '--allow-unauthenticated'
@@ -40,8 +40,8 @@ steps:
       - '--port=4000'
 
 images:
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:latest'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev-api/api:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev-api/api:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY

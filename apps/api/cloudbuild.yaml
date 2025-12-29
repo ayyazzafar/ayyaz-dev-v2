@@ -1,0 +1,47 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:latest'
+      - '-f'
+      - 'apps/api/Dockerfile'
+      - '.'
+
+  # Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:latest'
+
+  # Deploy to Cloud Run (env vars are set via gcloud run services update separately)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'ayyaz-dev-api'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--min-instances=0'
+      - '--max-instances=1'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--port=4000'
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/ayyaz-dev/api:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -51,7 +51,10 @@ export class TechnologiesController {
     @Query('skip') skip?: string,
     @Query('take') take?: string,
   ): Promise<TechnologyListResponseDto> {
-    return this.technologiesService.findAll({ skip: Number(skip), take: Number(take) });
+    return this.technologiesService.findAll({
+      skip: skip ? Number(skip) : undefined,
+      take: take ? Number(take) : undefined,
+    });
   }
 
   /**

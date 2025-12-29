@@ -1,0 +1,55 @@
+# Dependencies (will be installed fresh)
+**/node_modules
+
+# Build outputs
+**/dist
+**/.next
+**/.turbo
+
+# Git
+.git
+.gitignore
+
+# Environment files (secrets should be passed via Cloud Run)
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test files
+**/*.spec.ts
+**/*.test.ts
+**/coverage
+
+# Documentation (except README)
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE.md
+
+# Apps source we don't need (but keep package.json)
+apps/web/app
+apps/web/components
+apps/web/lib
+apps/web/public
+apps/admin/app
+apps/admin/components
+apps/admin/lib
+apps/admin/public
+apps/admin/providers
+
+# Packages we don't need source for (but keep package.json)
+packages/ui/src
+packages/api-client/src

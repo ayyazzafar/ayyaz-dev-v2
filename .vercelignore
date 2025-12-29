@@ -1,0 +1,18 @@
+# Don't upload node_modules - Vercel will install
+node_modules
+
+# Don't upload build outputs
+**/dist
+**/.next
+**/.turbo
+
+# Don't upload other apps' source (they have their own deployments)
+# apps/web
+# apps/api
+
+# Git
+.git
+
+# IDE
+.vscode
+.idea

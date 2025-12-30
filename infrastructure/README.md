@@ -137,9 +137,32 @@ To enable automatic deployments when you push to main:
 
 Now every push to `main` branch will automatically build and deploy!
 
-## Common Commands
+## Quick Commands (via bun/npm scripts)
+
+Run these from the **monorepo root** (no need to `cd infrastructure`):
 
 ```bash
+# Terraform
+bun run tf:init          # Initialize Terraform (first time)
+bun run tf:plan          # Preview changes
+bun run tf:apply         # Apply changes (with confirmation)
+bun run tf:apply:auto    # Apply changes (no confirmation - be careful!)
+bun run tf:destroy       # Destroy all resources (dangerous!)
+bun run tf:output        # Show current outputs (URLs, etc.)
+bun run tf:fmt           # Format Terraform files
+bun run tf:validate      # Validate configuration
+
+# Vercel
+bun run vercel:list        # List all Vercel projects
+bun run vercel:list:web    # List web app deployments
+bun run vercel:list:admin  # List admin app deployments
+```
+
+## Manual Commands (from infrastructure directory)
+
+```bash
+cd infrastructure
+
 # Initialize (first time or after provider changes)
 terraform init
 

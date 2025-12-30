@@ -15,11 +15,13 @@ export type { ProjectDto, SkillDto, ExperienceDto, TechnologyDto };
 // Type alias for grouped skills (API returns { [category]: SkillDto[] })
 export type GroupedSkills = Record<string, SkillDto[]>;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+// Base URL without /api - the API prefix is added in fetchAPI
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 // API fetch functions
 async function fetchAPI<T>(endpoint: string): Promise<T> {
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  // All NestJS endpoints are under /api prefix
+  const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
     next: { revalidate: 60 }, // Cache for 1 minute
   });
 

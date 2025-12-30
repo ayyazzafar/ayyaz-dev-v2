@@ -68,3 +68,29 @@ variable "api_url" {
   description = "Backend API URL for frontend apps to connect to"
   type        = string
 }
+
+variable "api_domain" {
+  description = "Custom domain for Cloud Run API (e.g., 'api.ayyaz.dev'). Leave empty to skip domain mapping."
+  type        = string
+  default     = ""
+}
+
+# =============================================================================
+# Namecheap Variables
+# =============================================================================
+
+variable "namecheap_user_name" {
+  description = "Namecheap account username"
+  type        = string
+}
+
+variable "namecheap_api_user" {
+  description = "Namecheap API user (usually same as username)"
+  type        = string
+}
+
+variable "namecheap_api_key" {
+  description = "Namecheap API key (from https://ap.www.namecheap.com/settings/tools/apiaccess/)"
+  type        = string
+  sensitive   = true
+}

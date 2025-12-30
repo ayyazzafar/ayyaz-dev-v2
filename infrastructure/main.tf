@@ -19,6 +19,10 @@ terraform {
       source  = "vercel/vercel"
       version = "~> 1.0"
     }
+    namecheap = {
+      source  = "namecheap/namecheap"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -157,4 +161,27 @@ resource "google_cloudbuild_trigger" "deploy" {
   filename = var.cloudbuild_config_path
 
   depends_on = [google_project_service.apis]
+}
+
+# =============================================================================
+# Custom Domain Mapping for Cloud Run API
+# =============================================================================
+# NOTE: Domain must be verified in Google Cloud first!
+# Run: gcloud domains verify ayyaz.dev
+# Or verify via Google Search Console
+
+resource "google_cloud_run_domain_mapping" "api" {
+  count    = var.api_domain != "" ? 1 : 0
+  location = var.region
+  name     = var.api_domain
+
+  metadata {
+    namespace = var.project_id
+  }
+
+  spec {
+    route_name = google_cloud_run_service.api.name
+  }
+
+  depends_on = [google_cloud_run_service.api]
 }

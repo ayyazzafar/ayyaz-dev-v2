@@ -70,14 +70,37 @@ resource "vercel_project_environment_variable" "web_api_url" {
 }
 
 # =============================================================================
+# Custom Domains
+# =============================================================================
+
+# Admin Dashboard Domain
+resource "vercel_project_domain" "admin" {
+  project_id = vercel_project.admin.id
+  domain     = "admin.ayyaz.dev"
+}
+
+# Web Domain (apex domain)
+resource "vercel_project_domain" "web" {
+  project_id = vercel_project.web.id
+  domain     = "ayyaz.dev"
+}
+
+# Web Domain (www redirect to apex)
+resource "vercel_project_domain" "web_www" {
+  project_id = vercel_project.web.id
+  domain     = "www.ayyaz.dev"
+  # Vercel automatically redirects www to apex when both are configured
+}
+
+# =============================================================================
 # Outputs
 # =============================================================================
 output "admin_url" {
   description = "Admin dashboard URL"
-  value       = "https://${vercel_project.admin.name}.vercel.app"
+  value       = "https://admin.ayyaz.dev"
 }
 
 output "web_url" {
   description = "Public website URL"
-  value       = "https://${vercel_project.web.name}.vercel.app"
+  value       = "https://ayyaz.dev"
 }

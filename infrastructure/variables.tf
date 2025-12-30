@@ -43,3 +43,28 @@ variable "env_vars" {
   default   = []
   sensitive = true
 }
+
+# =============================================================================
+# Vercel Variables
+# =============================================================================
+
+variable "vercel_api_token" {
+  description = "Vercel API token (from https://vercel.com/account/tokens)"
+  type        = string
+  sensitive   = true
+}
+
+variable "vercel_team_id" {
+  description = "Vercel team slug or ID (e.g., 'ayyaz-tech-hobby')"
+  type        = string
+}
+
+variable "project_prefix" {
+  description = "Prefix for Vercel project names (e.g., 'ayyaz-dev-v2' creates 'ayyaz-dev-v2-admin', 'ayyaz-dev-v2-web')"
+  type        = string
+}
+
+variable "api_url" {
+  description = "Backend API URL for frontend apps to connect to"
+  type        = string
+}

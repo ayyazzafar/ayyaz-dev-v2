@@ -15,6 +15,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.0"
     }
+    vercel = {
+      source  = "vercel/vercel"
+      version = "~> 1.0"
+    }
   }
 }
 

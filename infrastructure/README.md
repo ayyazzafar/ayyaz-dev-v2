@@ -1,13 +1,21 @@
-# GCP Cloud Run Infrastructure (Terraform)
+# Infrastructure as Code (Terraform)
 
-This Terraform configuration provisions everything needed to deploy a NestJS/Node.js API to Google Cloud Run.
+This Terraform configuration provisions **everything** needed for a full-stack monorepo:
+- **Backend (NestJS)** → Google Cloud Run
+- **Frontends (Next.js)** → Vercel
 
 ## What Gets Provisioned
 
-- **Artifact Registry**: Docker image storage with automatic cleanup (keeps last 3 images, deletes after 7 days)
-- **Cloud Run Service**: Serverless container hosting with configurable resources
-- **IAM Policy**: Public access to the API
-- **Cloud Build Trigger** (optional): Auto-deploy on git push (requires GitHub OAuth connection)
+### Google Cloud (Backend)
+- **Artifact Registry**: Docker image storage with automatic cleanup
+- **Cloud Run Service**: Serverless container hosting
+- **Cloud Build Trigger**: Auto-deploy on git push
+- **IAM Policy**: Public API access
+
+### Vercel (Frontends)
+- **Admin Dashboard**: Next.js admin app
+- **Public Website**: Next.js public-facing site
+- **Environment Variables**: Managed in code
 
 ## Prerequisites
 
@@ -22,13 +30,16 @@ This Terraform configuration provisions everything needed to deploy a NestJS/Nod
    brew install terraform  # macOS
    ```
 
-3. **Docker image** must exist before first `terraform apply` (see "First-Time Setup" below)
+3. **Vercel API Token** from https://vercel.com/account/tokens
+
+4. **Docker image** must exist before first `terraform apply` (see "First-Time Setup" below)
 
 ## File Structure
 
 ```
 infrastructure/
-├── main.tf                 # Main resource definitions
+├── main.tf                 # GCP resources (Cloud Run, Artifact Registry, Cloud Build)
+├── vercel.tf               # Vercel resources (projects, env vars)
 ├── variables.tf            # Variable declarations
 ├── outputs.tf              # Output values after apply
 ├── terraform.tfvars        # Project-specific values (commit to git)
@@ -207,3 +218,58 @@ Typical cost for a low-traffic API: **< $1/month**
 1. **Never commit `terraform.tfvars.secret`** - it's gitignored for a reason
 2. **Use Terraform state backend** for team projects (e.g., GCS bucket)
 3. **Rotate secrets** regularly and update via Terraform
+
+---
+
+## Turborepo + Vercel Pattern (IMPORTANT)
+
+This section documents the specific configuration needed for deploying Turborepo monorepo apps to Vercel.
+
+### The Key Pattern
+
+For each Next.js app in a Turborepo monorepo:
+
+| Setting | Value |
+|---------|-------|
+| Root Directory | `apps/{app-name}` (e.g., `apps/admin`) |
+| Build Command | `cd ../.. && bun run build --filter=@scope/app-name` |
+| Install Command | `cd ../.. && bun install` |
+
+**Why this works:**
+1. Root Directory tells Vercel where the Next.js app lives
+2. `cd ../..` goes back to monorepo root where Turbo can see all packages
+3. `--filter` tells Turbo which app to build
+4. Turbo automatically builds dependencies first (database, shared packages)
+
+### Critical: Orval-Generated Files Must Be Committed
+
+If your frontend uses Orval to generate API clients:
+
+```
+apps/admin/lib/api/generated/  ← MUST be in Git, NOT gitignored
+```
+
+**Why:** Vercel builds can't access `localhost:4000` to generate these files at build time. Generate locally, commit, push.
+
+### Troubleshooting Vercel + Turborepo
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| "No Next.js version detected" | Root Directory wrong | Set to `apps/{app}`, not `.` |
+| "Module not found: @/lib/api/generated/..." | Orval files not committed | Remove from .gitignore, run orval locally, commit |
+| "Cannot find module '@scope/database'" | Turbo not running from root | Use `cd ../.. &&` in build command |
+| Build succeeds but wrong app deploys | Wrong `--filter` flag | Check package.json `name` matches filter |
+
+### Manual Vercel Setup (Without Terraform)
+
+If not using Terraform, configure each project in Vercel Dashboard:
+
+**Admin Project:**
+- Root Directory: `apps/admin`
+- Build Command: `cd ../.. && bun run build --filter=@ayyaz-dev/admin`
+- Install Command: `cd ../.. && bun install`
+
+**Web Project:**
+- Root Directory: `apps/web`
+- Build Command: `cd ../.. && bun run build --filter=@ayyaz-dev/web`
+- Install Command: `cd ../.. && bun install`

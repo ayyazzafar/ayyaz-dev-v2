@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
 import { FileUploadService } from './file-upload.service.js';
 import type { PresignedUrlRequest, PresignedUrlResponse } from '../shared/types.js';
@@ -16,20 +17,33 @@ import type { PresignedUrlRequest, PresignedUrlResponse } from '../shared/types.
  * DTO for presigned URL request
  */
 export class PresignedUrlRequestDto implements PresignedUrlRequest {
-  /** Original filename */
+  @ApiProperty({
+    example: 'photo.jpg',
+    description: 'Original filename',
+  })
   @IsString()
   filename!: string;
 
-  /** MIME type of the file */
+  @ApiProperty({
+    example: 'image/jpeg',
+    description: 'MIME type of the file',
+  })
   @IsString()
   contentType!: string;
 
-  /** File size in bytes */
+  @ApiProperty({
+    example: 1024000,
+    description: 'File size in bytes',
+    minimum: 1,
+  })
   @IsNumber()
   @Min(1)
   size!: number;
 
-  /** Optional folder/prefix for the file key */
+  @ApiPropertyOptional({
+    example: 'projects',
+    description: 'Optional folder/prefix for the file key',
+  })
   @IsOptional()
   @IsString()
   folder?: string;

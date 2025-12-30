@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, MinLength } from 'class-validator';
 
 /**
@@ -7,19 +8,19 @@ import { IsString, IsOptional, MinLength } from 'class-validator';
  * Example: React, Next.js, PostgreSQL, etc.
  */
 export class CreateTechnologyDto {
-  /**
-   * Technology name (unique)
-   * @example "Next.js"
-   */
+  @ApiProperty({
+    example: 'Next.js',
+    description: 'Technology name (unique)',
+    minLength: 1,
+  })
   @IsString()
   @MinLength(1)
   name: string;
 
-  /**
-   * Icon identifier or URL (optional)
-   * Could be a simple icon name or full URL
-   * @example "nextjs" or "https://cdn.example.com/icons/nextjs.svg"
-   */
+  @ApiPropertyOptional({
+    example: 'nextjs',
+    description: 'Icon identifier or URL (e.g., "nextjs" or full URL)',
+  })
   @IsOptional()
   @IsString()
   icon?: string;

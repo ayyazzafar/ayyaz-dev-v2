@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsBoolean,
@@ -14,57 +15,62 @@ import {
  * Work experience entries for the resume/portfolio section.
  */
 export class CreateExperienceDto {
-  /**
-   * Company name
-   * @example "Tech Corp"
-   */
+  @ApiProperty({
+    example: 'Tech Corp',
+    description: 'Company name',
+    minLength: 1,
+  })
   @IsString()
   @MinLength(1)
   company: string;
 
-  /**
-   * Job role/title
-   * @example "Senior Full Stack Developer"
-   */
+  @ApiProperty({
+    example: 'Senior Full Stack Developer',
+    description: 'Job role/title',
+    minLength: 1,
+  })
   @IsString()
   @MinLength(1)
   role: string;
 
-  /**
-   * Role description (optional, can include achievements)
-   * @example "Led development of microservices architecture..."
-   */
+  @ApiPropertyOptional({
+    example: 'Led development of microservices architecture...',
+    description: 'Role description (optional, can include achievements)',
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
-  /**
-   * Start date
-   * @example "2020-01-15"
-   */
+  @ApiProperty({
+    example: '2020-01-15',
+    description: 'Start date (ISO date string)',
+  })
   @IsDateString()
   startDate: string;
 
-  /**
-   * End date (null if current position)
-   * @example "2023-06-30"
-   */
+  @ApiPropertyOptional({
+    example: '2023-06-30',
+    description: 'End date (null if current position)',
+  })
   @IsOptional()
   @IsDateString()
   endDate?: string;
 
-  /**
-   * Is this the current position?
-   * @example true
-   */
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Is this the current position?',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   current?: boolean = false;
 
-  /**
-   * Display order (lower = first, typically most recent)
-   * @example 0
-   */
+  @ApiPropertyOptional({
+    example: 0,
+    description: 'Display order (lower = first, typically most recent)',
+    minimum: 0,
+    default: 0,
+  })
   @IsOptional()
   @IsInt()
   @Min(0)

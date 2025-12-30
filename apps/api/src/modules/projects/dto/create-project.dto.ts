@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -34,28 +35,41 @@ export enum ProjectType {
 }
 
 /**
+ * CreateProjectImageDto - Represents an image in the images array
+ */
+export class CreateProjectImageDto {
+  @ApiProperty({
+    example: 'https://example.com/image.png',
+    description: 'Image URL',
+  })
+  @IsUrl({}, { message: 'Image URL must be a valid URL' })
+  url: string;
+
+  @ApiPropertyOptional({
+    example: 'Dashboard screenshot',
+    description: 'Alt text for accessibility',
+  })
+  @IsOptional()
+  @IsString()
+  alt?: string;
+
+  @ApiProperty({
+    example: 0,
+    description: 'Display order (lower = first)',
+  })
+  @IsNumber()
+  order: number;
+}
+
+/**
  * CreateProjectDto - Validates incoming project creation data
- *
- * KEY CONCEPTS:
- *
- * 1. Slug validation:
- *    - URL-friendly identifier (e.g., "spendnest", "ayyaztech")
- *    - Only lowercase letters, numbers, hyphens
- *    - Used for public URLs: /projects/spendnest
- *
- * 2. Technology handling:
- *    - Accept array of technology IDs
- *    - Service will create ProjectTechnology relations
- *
- * 3. Enums:
- *    - Must match Prisma enum values exactly
- *    - @IsEnum validates against allowed values
  */
 export class CreateProjectDto {
-  /**
-   * URL-friendly identifier for the project
-   * @example "spendnest"
-   */
+  @ApiProperty({
+    example: 'spendnest',
+    description: 'URL-friendly identifier (lowercase letters, numbers, hyphens only)',
+    minLength: 2,
+  })
   @IsString()
   @MinLength(2)
   @Matches(/^[a-z0-9-]+$/, {
@@ -63,127 +77,122 @@ export class CreateProjectDto {
   })
   slug: string;
 
-  /**
-   * Display title
-   * @example "SpendNest - Expense Tracker"
-   */
+  @ApiProperty({
+    example: 'SpendNest - Expense Tracker',
+    description: 'Display title',
+    minLength: 2,
+  })
   @IsString()
   @MinLength(2)
   title: string;
 
-  /**
-   * Short description (for cards/listings)
-   * @example "Personal expense tracking application"
-   */
+  @ApiPropertyOptional({
+    example: 'Personal expense tracking application',
+    description: 'Short description (for cards/listings)',
+    minLength: 10,
+  })
   @IsOptional()
   @IsString()
   @MinLength(10, { message: 'Description must be at least 10 characters if provided' })
   description?: string;
 
-  /**
-   * Full description with details (optional)
-   * @example "SpendNest is a comprehensive expense tracking app..."
-   */
+  @ApiPropertyOptional({
+    example: 'SpendNest is a comprehensive expense tracking app...',
+    description: 'Full description with details',
+  })
   @IsOptional()
   @IsString()
   longDescription?: string;
 
-  /**
-   * Project status
-   * @example "ACTIVE"
-   */
+  @ApiProperty({
+    example: 'ACTIVE',
+    description: 'Project status',
+    enum: ProjectStatus,
+  })
   @IsEnum(ProjectStatus, {
     message: 'Status must be one of: ACTIVE, COMPLETED, PAUSED, ARCHIVED',
   })
   status: ProjectStatus;
 
-  /**
-   * Project type/category
-   * @example "PRODUCT"
-   */
+  @ApiProperty({
+    example: 'PRODUCT',
+    description: 'Project type/category',
+    enum: ProjectType,
+  })
   @IsEnum(ProjectType, {
     message: 'Type must be one of: PRODUCT, CLIENT, EXPERIMENT, LEARNING',
   })
   type: ProjectType;
 
-  /**
-   * Live project URL (optional)
-   * @example "https://spendnest.app"
-   */
+  @ApiPropertyOptional({
+    example: 'https://spendnest.app',
+    description: 'Live project URL',
+  })
   @IsOptional()
   @IsUrl({}, { message: 'URL must be a valid URL' })
   url?: string;
 
-  /**
-   * GitHub repository URL (optional)
-   */
+  @ApiPropertyOptional({
+    example: 'https://github.com/ayyazzafar/spendnest',
+    description: 'GitHub repository URL',
+  })
   @IsOptional()
   @IsUrl({}, { message: 'GitHub URL must be a valid URL' })
   github?: string;
 
-  /**
-   * Featured on homepage?
-   * @example true
-   */
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Featured on homepage?',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   featured?: boolean;
 
-  /**
-   * Display order (lower = first)
-   * @example 1
-   */
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Display order (lower = first)',
+    minimum: 0,
+    default: 0,
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
   order?: number;
 
-  /**
-   * When project was started
-   * @example "2024-01-15"
-   */
+  @ApiPropertyOptional({
+    example: '2024-01-15',
+    description: 'When project was started',
+  })
   @IsOptional()
   @IsDateString()
   startedAt?: string;
 
-  /**
-   * When project was completed (if applicable)
-   * @example "2024-06-30"
-   */
+  @ApiPropertyOptional({
+    example: '2024-06-30',
+    description: 'When project was completed (if applicable)',
+  })
   @IsOptional()
   @IsDateString()
   completedAt?: string;
 
-  /**
-   * Array of technology IDs to associate with this project
-   * @example ["tech-id-1", "tech-id-2"]
-   */
+  @ApiPropertyOptional({
+    example: ['tech-id-1', 'tech-id-2'],
+    description: 'Array of technology IDs to associate with this project',
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   technologyIds?: string[];
 
-  /**
-   * Array of images for the project
-   */
+  @ApiPropertyOptional({
+    description: 'Array of images for the project',
+    type: [CreateProjectImageDto],
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateProjectImageDto)
   images?: CreateProjectImageDto[];
-}
-
-/**
- * CreateProjectImageDto - Represents an image in the images array
- */
-export class CreateProjectImageDto {
-  @IsUrl({}, { message: 'Image URL must be a valid URL' })
-  url: string;
-
-  @IsOptional()
-  @IsString()
-  alt?: string;
-
-  @IsNumber()
-  order: number;
 }

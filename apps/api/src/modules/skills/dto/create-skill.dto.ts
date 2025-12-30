@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsEnum,
@@ -26,37 +27,44 @@ export enum SkillCategory {
  * Skills are displayed on the portfolio to show expertise areas.
  */
 export class CreateSkillDto {
-  /**
-   * Skill name
-   * @example "React"
-   */
+  @ApiProperty({
+    example: 'React',
+    description: 'Skill name',
+    minLength: 1,
+  })
   @IsString()
   @MinLength(1)
   name: string;
 
-  /**
-   * Skill category for grouping
-   * @example "FRONTEND"
-   */
+  @ApiProperty({
+    example: 'FRONTEND',
+    description: 'Skill category for grouping',
+    enum: SkillCategory,
+  })
   @IsEnum(SkillCategory, {
     message: `Category must be one of: ${Object.values(SkillCategory).join(', ')}`,
   })
   category: SkillCategory;
 
-  /**
-   * Proficiency level (0-100)
-   * @example 90
-   */
+  @ApiPropertyOptional({
+    example: 90,
+    description: 'Proficiency level (0-100)',
+    minimum: 0,
+    maximum: 100,
+    default: 80,
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
   @Max(100)
   level?: number = 80;
 
-  /**
-   * Display order (lower = first)
-   * @example 1
-   */
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Display order (lower = first)',
+    minimum: 0,
+    default: 0,
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
